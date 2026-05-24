@@ -1,0 +1,540 @@
+    <!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WIMS - Warehouse Integrated Material System</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    min-height:100vh;
+    overflow-y:auto;
+    background:#0b1f3a;
+    transition: opacity 0.4s ease;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.container{
+    width:100%;
+    min-height:100vh;
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+}
+
+/* LEFT SIDE */
+.left{
+    position:relative;
+    padding:40px;
+    background:
+    linear-gradient(135deg,
+    rgba(0,40,85,0.96),
+    rgba(0,87,184,0.92)),
+    url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1600&auto=format&fit=crop') center/cover;
+    
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    overflow-y:auto;
+}
+
+.overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(
+        to right,
+        rgba(0,0,0,0.25),
+        rgba(0,0,0,0.05)
+    );
+}
+
+.content{
+    position:relative;
+    z-index:2;
+    max-width:650px;
+    margin: auto 0;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:24px;
+}
+
+.logo-icon{
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    background:linear-gradient(135deg,#38BDF8,#0057B8);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-size:24px;
+    box-shadow:0 10px 30px rgba(56,189,248,0.4);
+}
+
+.logo h2{
+    color:white;
+    font-size:24px;
+    font-weight:800;
+}
+
+.logo p{
+    color:rgba(255,255,255,0.7);
+    font-size:13px;
+}
+
+.badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.15);
+    color:#7dd3fc;
+    margin-bottom:16px;
+    backdrop-filter:blur(10px);
+    font-size:12px;
+    font-weight:600;
+}
+
+.dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#38BDF8;
+}
+
+h1{
+    color:white;
+    font-size:42px;
+    line-height:1.2;
+    font-weight:800;
+    margin-bottom:16px;
+}
+
+h1 span{
+    color:#38BDF8;
+}
+
+.desc{
+    color:rgba(255,255,255,0.75);
+    line-height:1.6;
+    font-size:14px;
+    margin-bottom:24px;
+    max-width:500px;
+}
+
+.stats{
+    display:flex;
+    gap:30px;
+    flex-wrap:wrap;
+}
+
+.stat h3{
+    color:white;
+    font-size:28px;
+    font-weight:800;
+}
+
+.stat p{
+    color:rgba(255,255,255,0.65);
+    font-size:12px;
+    margin-top:4px;
+}
+
+/* RIGHT SIDE */
+.right{
+    background:#f8fafc;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:30px;
+    position:relative;
+    overflow-y:auto;
+}
+
+.login-card{
+    width:100%;
+    margin:auto 0;
+    max-width:400px;
+    background:rgba(255,255,255,0.88);
+    backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,0.4);
+    border-radius:24px;
+    padding:36px;
+    box-shadow:
+    0 10px 40px rgba(0,0,0,0.08),
+    0 2px 8px rgba(0,0,0,0.04);
+}
+
+.login-top{
+    text-align:center;
+    margin-bottom:28px;
+}
+
+.login-top h2{
+    font-size:28px;
+    color:#0f172a;
+    margin-bottom:4px;
+    font-weight:800;
+}
+
+.login-top p{
+    color:#64748b;
+    font-size:13px;
+}
+
+.form-group{
+    margin-bottom:16px;
+}
+
+label{
+    display:block;
+    margin-bottom:6px;
+    font-size:13px;
+    font-weight:600;
+    color:#334155;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:1px solid #dbe3ee;
+    background:white;
+    font-size:14px;
+    transition:all .3s ease;
+}
+
+input:focus{
+    outline:none;
+    border-color:#38BDF8;
+    box-shadow:0 0 0 4px rgba(56,189,248,0.15);
+}
+
+.options{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:24px;
+}
+
+.remember{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    color:#475569;
+}
+
+.remember input{
+    width:auto;
+}
+
+.forgot{
+    font-size:13px;
+    color:#0057B8;
+    text-decoration:none;
+    font-weight:600;
+}
+
+.login-btn{
+    width:100%;
+    border:none;
+    padding:14px;
+    border-radius:12px;
+    background:linear-gradient(135deg,#38BDF8,#0057B8);
+    color:white;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .3s ease;
+    box-shadow:0 10px 24px rgba(0,87,184,0.25);
+}
+
+.login-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 16px 32px rgba(0,87,184,0.3);
+}
+
+.footer{
+    margin-top:24px;
+    text-align:center;
+    font-size:12px;
+    color:#94a3b8;
+}
+
+.preview-box{
+    margin-top:24px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:16px;
+    padding:16px;
+    backdrop-filter:blur(10px);
+}
+
+.preview-title{
+    color:white;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:12px;
+}
+
+.preview-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.preview-item{
+    background:rgba(255,255,255,0.08);
+    border-radius:12px;
+    padding:12px;
+}
+
+.preview-item h4{
+    color:white;
+    font-size:18px;
+    margin-bottom:4px;
+}
+
+.preview-item p{
+    color:rgba(255,255,255,0.6);
+    font-size:11px;
+}
+
+@media(max-width:980px){
+
+.container{
+    grid-template-columns:1fr;
+}
+
+.left{
+    display:none;
+}
+
+.right{
+    padding:24px;
+}
+
+.login-card{
+    padding:32px;
+}
+
+body{
+    overflow:auto;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- LEFT -->
+    <div class="left">
+
+        <div class="overlay"></div>
+
+        <div class="content">
+
+            <div class="logo">
+                <div class="logo-icon">🏭</div>
+                <div>
+                    <h2>WIMS</h2>
+                    <p>Warehouse Integrated Material System</p>
+                </div>
+            </div>
+
+            <div class="badge">
+                <div class="dot"></div>
+                Integrated Warehouse Monitoring Platform
+            </div>
+
+            <h1>
+                Smart Warehouse <br>
+                Material <span>Control System</span>
+            </h1>
+
+            <div class="desc">
+                Sistem monitoring dan tracking Bon Pinjam Material untuk operasional warehouse industri Oil & Gas yang modern, profesional, dan terintegrasi.
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <h3>24/7</h3>
+                    <p>Realtime Monitoring</p>
+                </div>
+
+                <div class="stat">
+                    <h3>100%</h3>
+                    <p>Tracking Visibility</p>
+                </div>
+
+                <div class="stat">
+                    <h3>ERP</h3>
+                    <p>Enterprise Ready</p>
+                </div>
+            </div>
+
+            <div class="preview-box">
+
+                <div class="preview-title">
+                    Dashboard Overview
+                </div>
+
+                <div class="preview-grid">
+
+                    <div class="preview-item">
+                        <h4 id="lp-open">-</h4>
+                        <p>Open Bon Pinjam</p>
+                    </div>
+
+                    <div class="preview-item">
+                        <h4 id="lp-ogi">-</h4>
+                        <p>Outstanding GI</p>
+                    </div>
+
+                    <div class="preview-item">
+                        <h4 id="lp-closed">-</h4>
+                        <p>Total Closed</p>
+                    </div>
+
+                    <div class="preview-item">
+                        <h4 id="lp-total">-</h4>
+                        <p>Total Material</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right">
+
+        <div class="login-card">
+
+            <div class="login-top">
+                <h2>Welcome Back</h2>
+                <p>Login untuk mengakses dashboard warehouse</p>
+            </div>
+
+            <div>
+
+                <div class="form-group">
+                    <label>Pilih Role</label>
+                    <select id="login-role" style="width:100%; padding:14px; border-radius:12px; border:1px solid #dbe3ee; background:white; font-size:14px; transition:all .3s ease; outline:none; appearance:none;">
+                        <option value="Admin">Admin Warehouse</option>
+                        <option value="Officer">Officer WH</option>
+                        <option value="Supervisor">Supervisor WH</option>
+                        <option value="SectionHead">Section Head</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-pass" placeholder="Masukkan password" onkeyup="if(event.key==='Enter') tryLogin()">
+                </div>
+
+                <div id="login-error" style="color: #dc2626; font-size: 13px; margin-bottom: 22px; min-height: 18px; font-weight: 500;"></div>
+
+                <button class="login-btn" onclick="tryLogin()">
+                    Login Dashboard
+                </button>
+
+            </div>
+
+            <div class="footer">
+                © 2026 Warehouse Integrated Material System
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+  const ROLES_CREDENTIALS = {
+    'Admin': 'adminwarehouse.RU6',
+    'Officer': 'Pertaminajaya#123',
+    'Supervisor': 'Pertaminajaya#123',
+    'SectionHead': 'Pertaminajaya#123'
+  };
+
+  function tryLogin() {
+    const role = document.getElementById('login-role').value;
+    const pass = document.getElementById('login-pass').value;
+    const errEl = document.getElementById('login-error');
+    
+    if(!pass) { 
+      if(errEl) errEl.textContent = 'Password harus diisi!'; 
+      return; 
+    }
+    
+    if(ROLES_CREDENTIALS[role] === pass) {
+      if(errEl) errEl.textContent = '';
+      sessionStorage.setItem('bonpinjam_role', role);
+      // Fade out effect
+      document.body.style.opacity = '0';
+      setTimeout(() => {
+        window.location.href = '../index.html'; 
+      }, 400);
+    } else {
+      if(errEl) errEl.textContent = 'Password salah!';
+    }
+  }
+
+  // Auto redirect if already logged in
+  if (sessionStorage.getItem('bonpinjam_role')) {
+     window.location.href = '../index.html';
+  }
+
+  // Load stats from local data
+  try {
+    const data = JSON.parse(localStorage.getItem('bonpinjam_data') || '[]');
+    const open = data.filter(r => r.status === 'PROCESS').length;
+    const closed = data.filter(r => r.status === 'CLOSED').length;
+    const ogi = data.filter(r => r.status === 'PROCESS' || r.status === 'WAITING GI STO').length;
+    let totalNilai = data.reduce((s, r) => s + (Number(r.total) || 0), 0);
+
+    const formatCurrency = (n) => {
+      if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(1) + 'B';
+      if (n >= 1e6) return 'Rp ' + (n / 1e6).toFixed(1) + 'M';
+      return 'Rp ' + (parseFloat(n)||0).toLocaleString('id-ID', {minimumFractionDigits:0, maximumFractionDigits:0});
+    };
+
+    document.getElementById('lp-open').textContent = open;
+    document.getElementById('lp-ogi').textContent = ogi;
+    document.getElementById('lp-closed').textContent = closed;
+    document.getElementById('lp-total').textContent = formatCurrency(totalNilai);
+  } catch(e) {
+    console.error('Error loading stats', e);
+  }
+</script>
+</body>
+</html>
