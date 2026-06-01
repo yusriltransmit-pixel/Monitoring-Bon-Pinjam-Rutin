@@ -1134,66 +1134,95 @@
           <label>Kode Google Apps Script (Copy & Paste ke Apps Script Editor)</label>
           <textarea class="form-control" rows="25" style="font-family:var(--mono);font-size:11px;" readonly>
 function doGet(e) {
-  var sheet = SpreadsheetApp.openById(e.parameter.id || ScriptApp.getScriptId()).getSheetByName(e.parameter.sheet || 'BonPinjam');
-  if (!sheet) return ContentService.createTextOutput(JSON.stringify({error:'Sheet not found'})).setMimeType(ContentService.MimeType.JSON);
-  var data = sheet.getDataRange().getValues();
-  if (data.length === 0) return ContentService.createTextOutput(JSON.stringify({data:[],headers:[]})).setMimeType(ContentService.MimeType.JSON);
-  var headers = data[0];
-  var rows = [];
-  for(var r=1; r<data.length; r++) {
-    // Cek kolom U (index 20) apakah DELETED
-    if (data[r][20] !== 'DELETED') {
-      var obj={}; headers.forEach(function(h,i){obj[h]=data[r][i];});
-      rows.push(obj);
+  try {
+    var id = e.parameter.id;
+    if (!id) return ContentService.createTextOutput(JSON.stringify({error:'Spreadsheet ID kosong.', data:[]})).setMimeType(ContentService.MimeType.JSON);
+    var ss = SpreadsheetApp.openById(id);
+    var sheet = ss.getSheetByName(e.parameter.sheet || 'BonPinjam');
+    if (!sheet) return ContentService.createTextOutput(JSON.stringify({error:'Sheet not found', data:[]})).setMimeType(ContentService.MimeType.JSON);
+    var data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return ContentService.createTextOutput(JSON.stringify({data:[],headers:data[0]||[]})).setMimeType(ContentService.MimeType.JSON);
+    var headers = data[0];
+    var rows = [];
+    for(var r=1; r<data.length; r++) {
+      if (data[r][21] !== 'DELETED') {
+        var obj={}; headers.forEach(function(h,i){obj[h]=data[r][i];});
+        rows.push(obj);
+      }
     }
+    return ContentService.createTextOutput(JSON.stringify({data:rows,headers:headers,success:true})).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({error:err.toString(), data:[]})).setMimeType(ContentService.MimeType.JSON);
   }
-  return ContentService.createTextOutput(JSON.stringify({data:rows,headers:headers})).setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
-  var payload = JSON.parse(e.postData.contents);
-  var ss = SpreadsheetApp.openById(payload.sheetId || SpreadsheetApp.getActiveSpreadsheet().getId());
-  var sheet = ss.getSheetByName(payload.sheetName || 'BonPinjam');
-  
-  if (!sheet) { sheet = ss.insertSheet(payload.sheetName || 'BonPinjam'); }
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['No','KIMAP','Material Description','Qty MIV','Unit','SLoc','Harga Satuan','Total Nilai','Penerima','Area','Tag Number','NOTIF/WO/PO STO','Tgl MIV','No Reg','Keterangan','Status','Nomor GI','Tgl GI','SLA GI','Tgl Entry', 'Deleted Status']);
-  }
-  
-  // Sheet Outstanding GI otomatis update pakai formula
-  var outSheet = ss.getSheetByName('Outstanding GI');
-  if (!outSheet) {
-    outSheet = ss.insertSheet('Outstanding GI');
-    outSheet.getRange('A1').setFormula("=QUERY('BonPinjam'!A:U, \"SELECT * WHERE P != 'CLOSED' AND U != 'DELETED' AND A IS NOT NULL\", 1)");
-  }
+  try {
+    var payload = JSON.parse(e.postData.contents);
+    if (!payload.sheetId) return ContentService.createTextOutput(JSON.stringify({error:'Spreadsheet ID kosong.'})).setMimeType(ContentService.MimeType.JSON);
+    var ss = SpreadsheetApp.openById(payload.sheetId);
+    var sheet = ss.getSheetByName(payload.sheetName || 'BonPinjam');
+    
+    if (!sheet) { sheet = ss.insertSheet(payload.sheetName || 'BonPinjam'); }
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(['No','KIMAP','Material Description','Qty MIV','Jumlah Dikeluarkan','Unit','SLoc','Harga Satuan','Total Nilai','Penerima','Area','Tag Number','NOTIF/WO/PO STO','Tgl MIV','No Reg','Keterangan','Status','Nomor GI','Tgl GI','SLA GI','Tgl Entry', 'Delete History', 'Editor']);
+    }
+    
+    var outSheet = ss.getSheetByName('Outstanding GI');
+    if (!outSheet) {
+      outSheet = ss.insertSheet('Outstanding GI');
+      outSheet.getRange('A1').setFormula('=QUERY(\'BonPinjam\'!A:W, "SELECT * WHERE Q != \'CLOSED\' AND V != \'DELETED\' AND A IS NOT NULL", 1)');
+    }
 
-  if (payload.action === 'add') { 
-    payload.row[20] = ''; // Kolom Deleted Status
-    sheet.appendRow(payload.row); 
-  }
-  else if (payload.action === 'update') {
-    var data = sheet.getDataRange().getValues();
-    for (var i=1;i<data.length;i++){ 
-      if(data[i][13]==payload.noreg){ 
-        payload.row[20] = ''; // Hapus flag deleted jika ada
-        sheet.getRange(i+1,1,1,payload.row.length).setValues([payload.row]); break; 
-      } 
+    if (payload.action === 'add') { 
+      payload.row[21] = ''; 
+      sheet.appendRow(payload.row); 
     }
-  }
-  else if (payload.action === 'delete') {
-    // Soft Delete: Jangan hapus dari Sheet untuk Backup & Keamanan
-    var data = sheet.getDataRange().getValues();
-    for (var i=data.length-1;i>=1;i--){ 
-      if(data[i][13]==payload.noreg){ 
-        // Tandai DELETED pada kolom U (21)
-        sheet.getRange(i+1, 21).setValue('DELETED'); 
-        // Beri warna background merah tipis
-        sheet.getRange(i+1, 1, 1, 21).setBackground('#ffebee');
-        break; 
-      } 
+    else if (payload.action === 'update') {
+      var data = sheet.getDataRange().getValues();
+      for (var i=data.length-1;i>=1;i--){ 
+        if(data[i][14]==payload.noreg){ 
+          payload.row[21] = ''; 
+          sheet.getRange(i+1,1,1,payload.row.length).setValues([payload.row]); break; 
+        } 
+      }
     }
+    else if (payload.action === 'delete') {
+      var data = sheet.getDataRange().getValues();
+      for (var i=data.length-1;i>=1;i--){ 
+        if(data[i][14]==payload.noreg){ 
+          sheet.getRange(i+1, 22).setValue('DELETED'); 
+          if(payload.row && payload.row[22]) sheet.getRange(i+1, 23).setValue(payload.row[22]);
+          sheet.getRange(i+1, 1, 1, 23).setBackground('#ffebee');
+          break; 
+        } 
+      }
+    }
+    else if (payload.action === 'sync_all') {
+      var sheetData = sheet.getDataRange().getValues();
+      var existingRegs = {};
+      for (var i = 1; i < sheetData.length; i++) {
+         var noreg = sheetData[i][14];
+         if (noreg) existingRegs[noreg] = i + 1; 
+      }
+      if (payload.rows && payload.rows.length > 0) {
+         for (var j = 0; j < payload.rows.length; j++) {
+            var r = payload.rows[j];
+            var noreg = r[14];
+            if (noreg && existingRegs[noreg]) {
+               r[21] = ''; 
+               sheet.getRange(existingRegs[noreg], 1, 1, r.length).setValues([r]);
+            } else {
+               r[21] = '';
+               sheet.appendRow(r);
+            }
+         }
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({success:true})).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
   }
-  return ContentService.createTextOutput(JSON.stringify({success:true})).setMimeType(ContentService.MimeType.JSON);
 }
           </textarea>
         </div>
@@ -1201,7 +1230,8 @@ function doPost(e) {
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="saveSettings()">Simpan Pengaturan</button>
           <button class="btn btn-outline" onclick="testConnection()">Test Koneksi</button>
-          <button class="btn btn-success" onclick="syncFromSheet()">Sync Data Sekarang</button>
+          <button class="btn btn-success" onclick="syncAppToSheet()">Upload Semua Data</button>
+          <button class="btn btn-outline" onclick="syncFromSheet()">Download dari Spreadsheet</button>
         </div>
 
         <div id="conn-result" style="margin-top:14px;font-size:12px;"></div>
@@ -1498,7 +1528,21 @@ function doPost(e) {
 <!-- TOAST -->
 <div id="toast-container"></div>
 
+<!-- LOADING OVERLAY -->
+<div id="global-loading" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:99999;justify-content:center;align-items:center;flex-direction:column;color:white;backdrop-filter:blur(2px);">
+  <div style="width:40px;height:40px;border:4px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:12px;"></div>
+  <div id="global-loading-text" style="font-weight:600;font-size:14px;letter-spacing:0.5px;">Memproses...</div>
+</div>
+<style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+
 <script>
+function showLoading(text) {
+  document.getElementById('global-loading-text').innerText = text || 'Memproses...';
+  document.getElementById('global-loading').style.display = 'flex';
+}
+function hideLoading() {
+  document.getElementById('global-loading').style.display = 'none';
+}
 /* ════════════════════════════════════════
    STATE & STORAGE
 ════════════════════════════════════════ */
@@ -1511,7 +1555,16 @@ let sortCol = 'tglmiv';
 let sortDir = 'desc';
 let filteredData = [];
 
+const PATENT_SHEET_ID = ""; // ISO JIKA INGIN PATENT: Ganti dengan ID Spreadsheet ("1BxiM...")
+const PATENT_WEB_APP_URL = ""; // ISI JIKA INGIN PATENT: Ganti dengan Web App URL ("https://script.google.com/macros/...")
+const PATENT_SHEET_NAME = "BonPinjam";
+
 let SETTINGS = JSON.parse(localStorage.getItem('bonpinjam_settings') || '{"sheetId":"","sheetName":"BonPinjam","appsScriptUrl":""}');
+
+// Jika pengaturan patent diisi, timpa localStorage agar selalu paten
+if (PATENT_SHEET_ID) SETTINGS.sheetId = PATENT_SHEET_ID;
+if (PATENT_WEB_APP_URL) SETTINGS.appsScriptUrl = PATENT_WEB_APP_URL;
+if (PATENT_SHEET_NAME) SETTINGS.sheetName = PATENT_SHEET_NAME;
 
 // Auto-generate No Reg
 function genReg() {
@@ -1642,7 +1695,7 @@ function calcTotal() {
   document.getElementById('f-total').value = formatCurrency(qty * harga);
 }
 
-function saveData() {
+async function saveData() {
   const required = [['f-kimap','KIMAP'],['f-desc','Material Description'],['f-qty','Qty MIV'],['f-unit','Unit'],['f-sloc','SLoc'],['f-penerima','Penerima'],['f-area','Area'],['f-tglmiv','Tanggal MIV']];
   for(const [id,label] of required) {
     if(!document.getElementById(id).value.trim()) { showToast('Field "'+label+'" wajib diisi!','error'); return; }
@@ -1673,15 +1726,18 @@ function saveData() {
   };
   if(editIndex === -1) {
     data.push(row);
-    showToast('Data berhasil ditambahkan!','success');
   } else {
     data[editIndex] = row;
-    showToast('Data berhasil diperbarui!','success');
   }
   saveLocal();
-  syncToSheet(row, editIndex===-1?'add':'update');
   closeModal();
   refreshAll();
+  
+  if(SETTINGS.appsScriptUrl && SETTINGS.appsScriptUrl.includes('/macros/s/')) {
+    showLoading('Menyimpan & sinkronisasi...');
+    await syncToSheet(row, editIndex===-1?'add':'update');
+    hideLoading();
+  }
 }
 
 let deleteIndex = -1;
@@ -1700,15 +1756,19 @@ function closeDeleteModalOutside(e) {
   if (e.target.id === 'delete-modal-overlay') closeDeleteModal();
 }
 
-function confirmDelete() {
+async function confirmDelete() {
   if (deleteIndex === -1) return;
   const row = data[deleteIndex];
   data.splice(deleteIndex,1);
   saveLocal();
-  syncToSheet(row,'delete');
-  showToast('Data dihapus.','info');
   refreshAll();
   closeDeleteModal();
+  
+  if(SETTINGS.appsScriptUrl && SETTINGS.appsScriptUrl.includes('/macros/s/')) {
+    showLoading('Menghapus dari Spreadsheet...');
+    await syncToSheet(row,'delete');
+    hideLoading();
+  }
 }
 
 function saveLocal() { localStorage.setItem('bonpinjam_data', JSON.stringify(data)); }
@@ -1905,7 +1965,7 @@ function getApprOverall(r) {
     return '<span class="badge badge-waiting">Waiting Officer</span>';
 }
 
-function setAppr(idx, role, val) {
+async function setAppr(idx, role, val) {
     if (!data[idx]) return;
     if (val === 'REJECTED' && !confirm('Yakin menolak approval ini?')) return;
     if (role === 'officer') data[idx].appr_officer = val;
@@ -1918,8 +1978,13 @@ function setAppr(idx, role, val) {
     }
     
     saveLocal();
-    if(typeof syncToSheet === 'function') syncToSheet(data[idx], 'update');
     renderApproval();
+    
+    if(typeof syncToSheet === 'function' && SETTINGS.appsScriptUrl && SETTINGS.appsScriptUrl.includes('/macros/s/')) {
+      showLoading('Sinkronisasi status...');
+      await syncToSheet(data[idx], 'update');
+      hideLoading();
+    }
 }
 
 let selectedApprItem = -1;
@@ -2685,17 +2750,54 @@ function printOGI() {
    GOOGLE SPREADSHEET INTEGRATION
 ════════════════════════════════════════ */
 function saveSettings() {
-  SETTINGS.sheetId = document.getElementById('sheet-id').value.trim();
+  if (PATENT_SHEET_ID || PATENT_WEB_APP_URL) {
+    showToast('Pengaturan patent aktif! Edit file index.html untuk mengubah.', 'info');
+    return;
+  }
+  
+  const urlVal = document.getElementById('apps-script-url').value.trim();
+  if (urlVal && (!urlVal.startsWith('https://script.google.com/') || !urlVal.includes('/macros/s/'))) {
+      showToast('URL Apps Script tidak valid. Pastikan itu adalah Web App URL (berisi /macros/s/ dan biasanya diakhiri dengan /exec).', 'warn');
+      return;
+  }
+  if (urlVal && urlVal.includes('/edit')) {
+      showToast('URL yang Anda masukkan adalah URL Editor (Berakhiran /edit). Silahkan copy Web App URL dari menu Deploy -> Manage deployments.', 'error');
+      return;
+  }
+  
+  let shId = document.getElementById('sheet-id').value.trim();
+  if (shId.includes('/d/')) {
+    try {
+       shId = shId.split('/d/')[1].split('/')[0];
+       document.getElementById('sheet-id').value = shId; // Update input visually
+    } catch(e) {}
+  }
+
+  SETTINGS.sheetId = shId;
   SETTINGS.sheetName = document.getElementById('sheet-name').value.trim()||'BonPinjam';
-  SETTINGS.appsScriptUrl = document.getElementById('apps-script-url').value.trim();
+  SETTINGS.appsScriptUrl = urlVal;
   localStorage.setItem('bonpinjam_settings', JSON.stringify(SETTINGS));
   showToast('Pengaturan disimpan!','success');
+  startAutoSync();
 }
 
 function loadSettings() {
-  document.getElementById('sheet-id').value = SETTINGS.sheetId||'';
-  document.getElementById('sheet-name').value = SETTINGS.sheetName||'BonPinjam';
-  document.getElementById('apps-script-url').value = SETTINGS.appsScriptUrl||'';
+  const sheetIdInput = document.getElementById('sheet-id');
+  const sheetNameInput = document.getElementById('sheet-name');
+  const appsScriptUrlInput = document.getElementById('apps-script-url');
+  
+  if (PATENT_SHEET_ID || PATENT_WEB_APP_URL) {
+    sheetIdInput.value = PATENT_SHEET_ID || SETTINGS.sheetId;
+    sheetNameInput.value = PATENT_SHEET_NAME || SETTINGS.sheetName;
+    appsScriptUrlInput.value = PATENT_WEB_APP_URL || SETTINGS.appsScriptUrl;
+    sheetIdInput.disabled = !!PATENT_SHEET_ID;
+    sheetNameInput.disabled = !!PATENT_SHEET_NAME;
+    appsScriptUrlInput.disabled = !!PATENT_WEB_APP_URL;
+  } else {
+    sheetIdInput.value = SETTINGS.sheetId||'';
+    sheetNameInput.value = SETTINGS.sheetName||'BonPinjam';
+    appsScriptUrlInput.value = SETTINGS.appsScriptUrl||'';
+  }
   updateSyncStatus();
 }
 
@@ -2711,7 +2813,7 @@ function updateSyncStatus() {
 
 async function testConnection() {
   const url = document.getElementById('apps-script-url').value.trim() || SETTINGS.appsScriptUrl;
-  if(!url) { showToast('Masukkan Apps Script URL terlebih dahulu.','error'); return; }
+  if(!url || !url.startsWith('https://script.google.com/')) { showToast('URL Apps Script tidak valid (harus https://script.google.com/...)','error'); return; }
   const res = document.getElementById('conn-result');
   res.innerHTML = '<span style="color:var(--slate-500);">🔄 Testing koneksi...</span>';
   try {
@@ -2724,38 +2826,101 @@ async function testConnection() {
   }
 }
 
+function formatSstDate(isoStr) {
+  if(!isoStr) return '';
+  const d = new Date(isoStr);
+  if(isNaN(d.getTime())) return isoStr;
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  const hh = String(d.getHours()).padStart(2,'0');
+  const min = String(d.getMinutes()).padStart(2,'0');
+  return `${yyyy}-${mm}-${dd}, ${hh}.${min}`;
+}
+
 async function syncToSheet(row, action) {
-  if(!SETTINGS.appsScriptUrl) return;
+  if(!SETTINGS.appsScriptUrl || !SETTINGS.appsScriptUrl.includes('/macros/s/')) return;
   try {
-    const rowArr = [data.indexOf(row)+1,row.kimap,row.desc,row.qty,row.unit,row.sloc,row.harga,row.total,row.penerima,row.area,row.tagno,row.notif,row.tglmiv,row.noreg,row.ket,row.status,row.nogi,row.tglgi,row.slagi,row.tglentry];
+    const prof = JSON.parse(localStorage.getItem('bonpinjam_profile') || '{}');
+    const role = sessionStorage.getItem('bonpinjam_role') || 'Sistem';
+    const editorName = `${role} - ${prof.nama || 'Unknown'}`;
+    const formattedTglEntry = formatSstDate(row.tglentry);
+    const rowArr = [data.indexOf(row)+1,row.kimap,row.desc,row.qty,row.qtyout !== undefined && row.qtyout !== '' ? row.qtyout : '',row.unit,row.sloc,row.harga,row.total,row.penerima,row.area,row.tagno,row.notif,row.tglmiv,row.noreg,row.ket,row.status,row.nogi,row.tglgi,row.slagi,formattedTglEntry, '', editorName];
     await fetch(SETTINGS.appsScriptUrl, {
       method: 'POST',
       mode: 'no-cors',
       headers: {'Content-Type':'text/plain'}, // Prevent CORS OPTIONS preflight
       body: JSON.stringify({ action, sheetId: SETTINGS.sheetId, sheetName: SETTINGS.sheetName, row: rowArr, noreg: row.noreg })
     });
-    showToast('Sync Successful!', 'success');
+    showToast('Tersinkronisasi ke Spreadsheet', 'success');
   } catch(e) {
-    showToast('Update Failed', 'error');
+    showToast('Gagal sinkron Spreadsheet:\n' + e.message, 'error');
     console.warn('Sync error:', e);
   }
 }
 
+async function syncAppToSheet() {
+  if(!SETTINGS.appsScriptUrl || !SETTINGS.appsScriptUrl.includes('/macros/s/')) {
+    showToast('URL Apps Script tidak valid atau belum diatur (Harus berupa Web App URL).','error');
+    return;
+  }
+  showLoading('Mengupload semua data... (Mohon tunggu)');
+  try {
+    const prof = JSON.parse(localStorage.getItem('bonpinjam_profile') || '{}');
+    const role = sessionStorage.getItem('bonpinjam_role') || 'Sistem';
+    const editorName = `${role} - ${prof.nama || 'Unknown'}`;
+    
+    const rows = data.map((row, index) => {
+      const formattedTglEntry = formatSstDate(row.tglentry);
+      return [index+1,row.kimap,row.desc,row.qty,row.qtyout !== undefined && row.qtyout !== '' ? row.qtyout : '',row.unit,row.sloc,row.harga,row.total,row.penerima,row.area,row.tagno,row.notif,row.tglmiv,row.noreg,row.ket,row.status,row.nogi,row.tglgi,row.slagi,formattedTglEntry, '', editorName];
+    });
+
+    await fetch(SETTINGS.appsScriptUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'text/plain'},
+      body: JSON.stringify({ 
+        action: 'sync_all', 
+        sheetId: SETTINGS.sheetId, 
+        sheetName: SETTINGS.sheetName, 
+        rows: rows 
+      })
+    });
+    hideLoading();
+    showToast('Semua data berhasil diupload ke Spreadsheet!', 'success');
+  } catch(e) {
+    hideLoading();
+    showToast('Upload gagal: ' + e.message, 'error');
+    console.error(e);
+  }
+}
+
 async function syncFromSheet(silent = false) {
-  if(!SETTINGS.appsScriptUrl) {
-    if(!silent) showToast('Konfigurasi Apps Script URL di Pengaturan terlebih dahulu.','error');
+  if(!SETTINGS.appsScriptUrl || !SETTINGS.appsScriptUrl.includes('/macros/s/')) {
+    if(!silent) showToast('Konfigurasi Web App URL Apps Script di Pengaturan terlebih dahulu.','error');
     if(!silent) checkSettingsAccess(document.querySelector('[data-page=settings]'));
     return;
   }
-  if(!silent) showToast('Menyinkronkan data dari Spreadsheet...','info');
+  if(!silent) showLoading('Mendownload data dari Spreadsheet...');
   try {
     const url = `${SETTINGS.appsScriptUrl}?id=${encodeURIComponent(SETTINGS.sheetId)}&sheet=${encodeURIComponent(SETTINGS.sheetName)}`;
     const res = await fetch(url);
     const json = await res.json();
+    
+    if (json.error) {
+       if(!silent) {
+         hideLoading();
+         showToast('Spreadsheet Error: ' + json.error, 'error');
+         alert('Gagal mengambil data Spreadsheet:\n\n' + json.error + '\n\nPastikan ID Spreadsheet benar dan hak aksesnya sudah tepat.');
+       }
+       console.error('Spreadsheet error:', json.error);
+       return;
+    }
+
     if(json.data && Array.isArray(json.data)) {
       const headers = json.headers||[];
       const keyMap = {
-        'kimap':'kimap','material description':'desc','qty miv':'qty','unit':'unit','sloc':'sloc',
+        'kimap':'kimap','material description':'desc','qty miv':'qty','jumlah dikeluarkan':'qtyout','unit':'unit','sloc':'sloc',
         'harga satuan':'harga','total nilai':'total','penerima':'penerima','area':'area',
         'tag number':'tagno','notif/wo/po sto':'notif','tgl miv':'tglmiv','no reg':'noreg',
         'keterangan':'ket','status':'status','nomor gi':'nogi','tgl gi':'tglgi','sla gi':'slagi'
@@ -2768,13 +2933,28 @@ async function syncFromSheet(silent = false) {
         return obj;
       }).filter(r => r.kimap||r.desc);
       
-      if (silent && JSON.stringify(data) === JSON.stringify(newData)) {
-        return; // nothing changed
+      // Optimization: Only stringify if lengths are the same, avoiding heavy computations
+      if (silent && data.length === newData.length) {
+         let isSame = true;
+         // Compare a fast hash or simple attributes first
+         for(let k=0; k<data.length; k++) {
+           if (data[k].noreg !== newData[k].noreg || data[k].status !== newData[k].status || data[k].tglentry !== newData[k].tglentry) {
+             isSame = false;
+             break;
+           }
+         }
+         
+         if (isSame && JSON.stringify(data) === JSON.stringify(newData)) {
+            return; // nothing changed
+         }
       }
       
       data = newData;
       saveLocal();
-      if(!silent) showToast('Sync Successful!', 'success');
+      if(!silent) {
+        hideLoading();
+        showToast('Sinkronisasi Berhasil', 'success');
+      }
       document.getElementById('sync-dot').className='sync-dot';
       document.getElementById('sync-text').textContent='Sinkron — '+new Date().toLocaleTimeString('id-ID');
       
@@ -2782,6 +2962,7 @@ async function syncFromSheet(silent = false) {
     }
   } catch(e) {
     if(!silent) {
+      hideLoading();
       if(e.message.includes('fetch') || e.message.includes('NetworkError') || e.message.includes('CORS')) {
         showToast('Update Failed', 'error');
         alert('PENTING: Sync Gagal (CORS Error).\n\nPenyebab:\nGoogle Apps Script Anda tidak dideploy dengan hak akses "Anyone".\n\nSolusi:\n1. Buka kembali Google Apps Script.\n2. Klik "Deploy" > "Manage deployments" (atau "New deployment").\n3. Pastikan "Who has access" adalah "Anyone".\n4. Simpan, copy ulang Web App URL-nya, lalu paste di PENGATURAN SPREADSHEET.');
@@ -2798,7 +2979,7 @@ function startAutoSync() {
   if (autoSyncInterval) clearInterval(autoSyncInterval);
   autoSyncInterval = setInterval(() => {
     if(SETTINGS.appsScriptUrl) syncFromSheet(true);
-  }, 10000);
+  }, 60000); // Sinkronisasi background tiap 60 detik (Diturunkan dari 10 detik agar tidak lemot)
 }
 
 /* ════════════════════════════════════════
