@@ -93,6 +93,10 @@
   .nav-item:hover { background: rgba(255,255,255,.05); color: white; }
   .nav-item.active { background: rgba(59,130,246,.12); border-left-color: var(--blue-500); color: var(--blue-200); font-weight: 500; }
   .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .8; }
+  .nav-submenu {
+    padding: 7px 20px 7px 46px; /* indent submenu items */
+    font-size: 12px;
+  }
   .nav-badge {
     margin-left: auto; background: var(--red-600); color: white;
     font-size: 10px; font-weight: 600; padding: 1px 6px;
@@ -544,11 +548,25 @@
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
     Dashboard Overview
   </div>
-  <div class="nav-item" data-page="data" onclick="navigate('data',this)">
+  <div class="nav-item" data-page="data" onclick="navigate('data',this, 'ALL')">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
     Data Bon Pinjam
     <span class="nav-badge" id="badge-open">0</span>
   </div>
+  <!-- Submenus for Data Bon Pinjam -->
+  <div class="nav-item nav-submenu" data-page="data" onclick="navigate('data',this, 'Chemical Catalyst')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.8 18.4L14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6zM11 16c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm2-4c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>
+    Chemical Catalyst
+  </div>
+  <div class="nav-item nav-submenu" data-page="data" onclick="navigate('data',this, 'Sparepart')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.5 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+    Sparepart
+  </div>
+  <div class="nav-item nav-submenu" data-page="data" onclick="navigate('data',this, 'BAU')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
+    BAU
+  </div>
+
   <div class="nav-item" data-page="outstanding" onclick="navigate('outstanding',this)">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
     Outstanding GI
@@ -629,7 +647,7 @@
       <div class="banner">
         <div class="banner-left">
           <h1>📋 BON PINJAM RUTIN 2026</h1>
-          <p>Sistem Monitoring &amp; Tracking Material Warehouse — Chemical</p>
+          <p>Sistem Monitoring &amp; Tracking Material Warehouse </p>
         </div>
         <div class="banner-stats">
           <div class="banner-stat">
@@ -768,13 +786,17 @@
         </div>
         <select class="filter-select" id="filter-status" onchange="filterTable()">
           <option value="">Semua Status</option>
-          <option value="PROCESS">Process</option>
-          <option value="WAITING GI STO">Waiting GI STO</option>
+          <option value="WAITING WO">Waiting WO</option>
+          <option value="WAITING RESERVASI">Waiting Reservasi</option>
+          <option value="WAITING GOODS ISSUE">Waiting Goods Issue</option>
           <option value="WAITING PO STO">Waiting PO STO</option>
           <option value="CLOSED">Closed</option>
         </select>
-        <select class="filter-select" id="filter-area" onchange="filterTable()">
-          <option value="">Semua Area</option>
+        <select class="filter-select" id="filter-klasifikasi" onchange="filterTable()">
+          <option value="">Semua Kategori</option>
+          <option value="Chemical Catalyst">Chemical Catalyst</option>
+          <option value="Sparepart">Sparepart</option>
+          <option value="BAU">BAU</option>
         </select>
         <select class="filter-select" id="filter-month" onchange="filterTable()">
           <option value="">Semua Bulan</option>
@@ -802,6 +824,7 @@
           <thead>
             <tr>
               <th onclick="sortTable('no')">No</th>
+              <th onclick="sortTable('klasifikasi')">Klasifikasi</th>
               <th onclick="sortTable('kimap')">KIMAP</th>
               <th onclick="sortTable('desc')">Material Description</th>
               <th onclick="sortTable('qty')">Qty MIV</th>
@@ -825,7 +848,7 @@
             </tr>
           </thead>
           <tbody id="table-body">
-            <tr><td colspan="20" class="table-no-data">Belum ada data. Klik "Tambah Data" untuk menambahkan bon pinjam.</td></tr>
+            <tr><td colspan="22" class="table-no-data">Belum ada data. Klik "Tambah Data" untuk menambahkan bon pinjam.</td></tr>
           </tbody>
         </table>
       </div>
@@ -873,10 +896,11 @@
               <th>Status SLA</th>
               <th>Total Nilai</th>
               <th>Keterangan</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody id="ogi-body">
-            <tr><td colspan="10" class="table-no-data">Tidak ada outstanding GI saat ini.</td></tr>
+            <tr><td colspan="11" class="table-no-data">Tidak ada outstanding GI saat ini.</td></tr>
           </tbody>
         </table>
       </div>
@@ -911,7 +935,7 @@
           <thead>
             <tr>
               <th style="width: 40px; text-align: center;"><input type="checkbox" id="check-all-appr" onchange="toggleAllAppr(this)" /></th>
-              <th>No Reg</th>
+              <th>No Reservasi</th>
               <th>Material</th>
               <th>Penerima</th>
               <th>Area</th>
@@ -937,7 +961,7 @@
       <div class="section-hdr">
         <div>
           <h2>Arsip Center</h2>
-          <p>Upload dokumen fisik MIV yang telah ditandatangani sesuai dengan Nomor Registrasi / Nomor Request</p>
+          <p>Upload dokumen fisik MIV yang telah ditandatangani sesuai dengan Nomor Reservasi / Nomor Request</p>
         </div>
         <div>
           <button class="btn btn-primary" onclick="window.open('https://ptptmn-my.sharepoint.com/:f:/r/personal/mohammad_riszki_pertamina_com/Documents/WAREHOUSE%20-%20YUSRIL%20WAHYU/Dokumen%20MIV%20BAU?csf=1&web=1&e=nVwnqZ', '_blank')">
@@ -951,7 +975,7 @@
         <table>
           <thead>
             <tr>
-              <th>No Reg</th>
+              <th>No Reservasi</th>
               <th>Tgl. MIV</th>
               <th>Penerima</th>
               <th>List Material</th>
@@ -1012,8 +1036,11 @@
             <label>Status</label>
             <select class="form-control" id="rpt-status">
               <option value="">Semua Status</option>
-              <option>PROCESS</option><option>WAITING GI STO</option>
-              <option>WAITING PO STO</option><option>CLOSED</option>
+              <option value="WAITING WO">WAITING WO</option>
+              <option value="WAITING RESERVASI">WAITING RESERVASI</option>
+              <option value="WAITING GOODS ISSUE">WAITING GOODS ISSUE</option>
+              <option value="WAITING PO STO">WAITING PO STO</option>
+              <option value="CLOSED">CLOSED</option>
             </select>
           </div>
         </div>
@@ -1136,12 +1163,26 @@
 function doGet(e) {
   try {
     var id = e.parameter.id;
-    if (!id) return ContentService.createTextOutput(JSON.stringify({error:'Spreadsheet ID kosong.', data:[]})).setMimeType(ContentService.MimeType.JSON);
+    var cb = e.parameter.callback;
+
+    function respond(resObj) {
+      if (cb) {
+        return ContentService.createTextOutput(cb + '(' + JSON.stringify(resObj) + ')').setMimeType(ContentService.MimeType.JAVASCRIPT);
+      } else {
+        return ContentService.createTextOutput(JSON.stringify(resObj)).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+
+    if (e.parameter.action === 'ping') {
+      return respond({status: 'ok', success: true});
+    }
+
+    if (!id) return respond({error:'Spreadsheet ID kosong.', data:[]});
     var ss = SpreadsheetApp.openById(id);
     var sheet = ss.getSheetByName(e.parameter.sheet || 'BonPinjam');
-    if (!sheet) return ContentService.createTextOutput(JSON.stringify({error:'Sheet not found', data:[]})).setMimeType(ContentService.MimeType.JSON);
+    if (!sheet) return respond({error:'Sheet not found', data:[]});
     var data = sheet.getDataRange().getValues();
-    if (data.length <= 1) return ContentService.createTextOutput(JSON.stringify({data:[],headers:data[0]||[]})).setMimeType(ContentService.MimeType.JSON);
+    if (data.length <= 1) return respond({data:[],headers:data[0]||[]});
     var headers = data[0];
     var rows = [];
     for(var r=1; r<data.length; r++) {
@@ -1150,9 +1191,13 @@ function doGet(e) {
         rows.push(obj);
       }
     }
-    return ContentService.createTextOutput(JSON.stringify({data:rows,headers:headers,success:true})).setMimeType(ContentService.MimeType.JSON);
+    return respond({data:rows,headers:headers,success:true});
   } catch(err) {
-    return ContentService.createTextOutput(JSON.stringify({error:err.toString(), data:[]})).setMimeType(ContentService.MimeType.JSON);
+    var errObj = {error:err.toString(), data:[]};
+    if (e.parameter.callback) {
+       return ContentService.createTextOutput(e.parameter.callback + '(' + JSON.stringify(errObj) + ')').setMimeType(ContentService.MimeType.JAVASCRIPT);
+    }
+    return ContentService.createTextOutput(JSON.stringify(errObj)).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
@@ -1165,13 +1210,13 @@ function doPost(e) {
     
     if (!sheet) { sheet = ss.insertSheet(payload.sheetName || 'BonPinjam'); }
     if (sheet.getLastRow() === 0) {
-      sheet.appendRow(['No','KIMAP','Material Description','Qty MIV','Jumlah Dikeluarkan','Unit','SLoc','Harga Satuan','Total Nilai','Penerima','Area','Tag Number','NOTIF/WO/PO STO','Tgl MIV','No Reg','Keterangan','Status','Nomor GI','Tgl GI','SLA GI','Tgl Entry', 'Delete History', 'Editor']);
+      sheet.appendRow(['No','KIMAP','Material Description','Qty MIV','Jumlah Dikeluarkan','Unit','SLoc','Harga Satuan','Total Nilai','Penerima','Area','Tag Number','NOTIF/WO/PO STO','Tgl MIV','No Reservasi','Keterangan','Status','Nomor GI','Tgl GI','SLA GI','Tgl Entry', 'Delete History', 'Editor', 'Klasifikasi']);
     }
     
     var outSheet = ss.getSheetByName('Outstanding GI');
     if (!outSheet) {
       outSheet = ss.insertSheet('Outstanding GI');
-      outSheet.getRange('A1').setFormula('=QUERY(\'BonPinjam\'!A:W, "SELECT * WHERE Q != \'CLOSED\' AND V != \'DELETED\' AND A IS NOT NULL", 1)');
+      outSheet.getRange('A1').setFormula('=QUERY(\'BonPinjam\'!A:X, "SELECT * WHERE Q != \'CLOSED\' AND V != \'DELETED\' AND A IS NOT NULL", 1)');
     }
 
     if (payload.action === 'add') { 
@@ -1193,7 +1238,7 @@ function doPost(e) {
         if(data[i][14]==payload.noreg){ 
           sheet.getRange(i+1, 22).setValue('DELETED'); 
           if(payload.row && payload.row[22]) sheet.getRange(i+1, 23).setValue(payload.row[22]);
-          sheet.getRange(i+1, 1, 1, 23).setBackground('#ffebee');
+          sheet.getRange(i+1, 1, 1, 24).setBackground('#ffebee');
           break; 
         } 
       }
@@ -1314,6 +1359,82 @@ function doPost(e) {
           </div>
         </div>
       </div>
+
+      <div class="card" style="margin-bottom: 24px; border: 1px solid var(--slate-200); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <div style="border-bottom: 1px solid var(--slate-100); padding-bottom: 16px; margin-bottom: 20px;">
+          <h3 style="display: flex; align-items: center; gap: 10px; color: var(--slate-800); font-size: 18px;">
+             <div style="background: var(--blue-50); padding: 8px; border-radius: 8px; display: flex;">
+               <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--blue-600)"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+             </div>
+             Panduan Pengisian Formulir MIV (Bon Pinjam)
+          </h3>
+          <p style="margin-top: 8px; font-size: 14px; color: var(--slate-500); line-height: 1.5;">Formulir ini dirancang untuk memastikan akurasi data dan mempercepat proses administrasi gudang. Mohon lengkapi seluruh field dengan cermat mengikuti standar operasional yang berlaku.</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          
+          <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="background: var(--blue-600); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">1</span>
+              <h4 style="font-size: 15px; color: var(--slate-800); margin: 0;">Klasifikasi Material <span style="color: var(--red-500); font-size: 12px;">[Wajib]</span></h4>
+            </div>
+            <p style="font-size: 14px; color: var(--slate-600); margin: 0; padding-left: 32px;">Pilih kategori material (Chemical Catalyst, Sparepart, atau BAU) untuk menentukan alur pencatatan dan pelaporan sistem.</p>
+          </div>
+
+          <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span style="background: var(--blue-600); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">2</span>
+              <h4 style="font-size: 15px; color: var(--slate-800); margin: 0;">Identitas Dokumen & Material</h4>
+            </div>
+            <ul style="margin: 0; padding-left: 48px; font-size: 14px; color: var(--slate-600); display: flex; flex-direction: column; gap: 6px; list-style-type: disc;">
+              <li><strong>KIMAP <span style="color: var(--red-500);">[Wajib]</span>:</strong> Masukkan kode material standar.</li>
+              <li><strong>No. Reservasi <span style="color: var(--red-500);">[Wajib]</span>:</strong> Isi secara manual. Catatan: Jika belum ada No. Reservasi harap isi dengan "Belum ada" pada kolom ini.</li>
+              <li><strong>Material Description <span style="color: var(--red-500);">[Wajib]</span>:</strong> Tuliskan deskripsi spesifikasi barang secara lengkap dan akurat.</li>
+            </ul>
+          </div>
+
+          <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span style="background: var(--blue-600); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">3</span>
+              <h4 style="font-size: 15px; color: var(--slate-800); margin: 0;">Kuantitas & Satuan Pengukuran</h4>
+            </div>
+            <ul style="margin: 0; padding-left: 48px; font-size: 14px; color: var(--slate-600); display: flex; flex-direction: column; gap: 6px; list-style-type: disc;">
+              <li><strong>Qty MIV <span style="color: var(--red-500);">[Wajib]</span>:</strong> Jumlah material yang diminta sesuai dokumen persetujuan.</li>
+              <li><strong>Jumlah Dikeluarkan <span style="color: var(--red-500);">[Wajib]</span>:</strong> Kuantitas fisik riil yang diserahkan dari gudang.</li>
+              <li><strong>Unit <span style="color: var(--red-500);">[Wajib]</span>:</strong> Pilih satuan hitung (PCS, LTR, KG, dll) atau gunakan opsi "Lainnya" untuk satuan khusus.</li>
+            </ul>
+          </div>
+
+          <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span style="background: var(--blue-600); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">4</span>
+              <h4 style="font-size: 15px; color: var(--slate-800); margin: 0;">Penyimpanan & Valuasi</h4>
+            </div>
+            <ul style="margin: 0; padding-left: 48px; font-size: 14px; color: var(--slate-600); display: flex; flex-direction: column; gap: 6px; list-style-type: disc;">
+              <li><strong>SLoc (Storage Location) <span style="color: var(--red-500);">[Wajib]</span>:</strong> Pilih titik penyimpanan origin atau gunakan "Lainnya".</li>
+              <li><strong>Harga Satuan (Rp):</strong> Jika tersedia, sistem akan secara otomatis mengkalkulasi Total Nilai dari Harga × Qty.</li>
+            </ul>
+          </div>
+
+          <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span style="background: var(--blue-600); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">5</span>
+              <h4 style="font-size: 15px; color: var(--slate-800); margin: 0;">Distribusi & Penerimaan</h4>
+            </div>
+            <ul style="margin: 0; padding-left: 48px; font-size: 14px; color: var(--slate-600); display: flex; flex-direction: column; gap: 6px; list-style-type: disc;">
+              <li><strong>Penerima <span style="color: var(--red-500);">[Wajib]</span>:</strong> Nama PIC pengambil barang atau penanggung jawab aset di lapangan.</li>
+              <li><strong>Area <span style="color: var(--red-500);">[Wajib]</span>:</strong> Area tujuan operasional atau titik pemakaian material.</li>
+              <li><strong>Tanggal MIV <span style="color: var(--red-500);">[Wajib]</span>:</strong> Tanggal dokumen dan fisik barang diserahkan.</li>
+            </ul>
+          </div>
+
+          <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 12px 16px; display: flex; gap: 12px; align-items: center;">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="var(--red-500)" style="flex-shrink: 0;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <p style="font-size: 13px; color: var(--red-700); margin: 0;">Lakukan verifikasi ulang pada seluruh isian sebelum menekan tombol "Simpan Data". Akurasi data menentukan perhitungan SLA dan pelaporan Outstanding GI yang optimal.</p>
+          </div>
+
+        </div>
+      </div>
     </div>
 
   </div><!-- /content -->
@@ -1329,13 +1450,22 @@ function doPost(e) {
       </button>
     </div>
     <div class="form-grid">
+      <div class="form-group full">
+        <label>Klasifikasi Material *</label>
+        <select class="form-control" id="f-klasifikasi">
+          <option value="">-- Pilih Klasifikasi --</option>
+          <option value="Chemical Catalyst">Chemical Catalyst</option>
+          <option value="Sparepart">Sparepart</option>
+          <option value="BAU">BAU</option>
+        </select>
+      </div>
       <div class="form-group">
         <label>KIMAP *</label>
         <input type="text" class="form-control" id="f-kimap" placeholder="Kode KIMAP">
       </div>
       <div class="form-group">
-        <label>No. Registrasi *</label>
-        <input type="text" class="form-control" id="f-noreg" placeholder="Auto / Manual">
+        <label>No. Reservasi *</label>
+        <input type="text" class="form-control" id="f-noreg" placeholder="Ketik No. Reservasi...">
       </div>
       <div class="form-group full">
         <label>Material Description *</label>
@@ -1346,19 +1476,34 @@ function doPost(e) {
         <input type="number" class="form-control" id="f-qty" placeholder="0" min="0" step="any" oninput="calcTotal()">
       </div>
       <div class="form-group">
-        <label>Jumlah Dikeluarkan</label>
+        <label>Jumlah Dikeluarkan *</label>
         <input type="number" class="form-control" id="f-qty-out" placeholder="0" min="0" step="any">
       </div>
       <div class="form-group">
         <label>Unit *</label>
-        <select class="form-control" id="f-unit">
+        <select class="form-control" id="f-unit" onchange="if(this.value==='LAINNYA') { document.getElementById('f-unit-custom').style.display='block'; } else { document.getElementById('f-unit-custom').style.display='none'; }">
           <option value="">Pilih Unit...</option>
           <option>PCS</option><option>EA</option><option>M</option><option>KG</option><option>LTR</option><option>SET</option><option>ROL</option><option>BTL</option><option>BOX</option><option>DRUM</option>
+          <option value="LAINNYA">Lainnya (Ketik Manual)</option>
         </select>
+        <input type="text" class="form-control" id="f-unit-custom" style="display:none; margin-top: 6px;" placeholder="Ketik Unit manual...">
       </div>
       <div class="form-group">
         <label>SLoc *</label>
-        <input type="text" class="form-control" id="f-sloc" placeholder="Storage Location">
+        <select class="form-control" id="f-sloc" onchange="if(this.value==='LAINNYA') { document.getElementById('f-sloc-custom').style.display='block'; } else { document.getElementById('f-sloc-custom').style.display='none'; }">
+          <option value="">-- Pilih SLoc --</option>
+          <option value="66GM – General Material">66GM – General Material</option>
+          <option value="66IN – Instrument">66IN – Instrument</option>
+          <option value="66IS – Insurance">66IS – Insurance</option>
+          <option value="66OH – Overhaul">66OH – Overhaul</option>
+          <option value="66RC – Recondition">66RC – Recondition</option>
+          <option value="66SP – Sparepart">66SP – Sparepart</option>
+          <option value="66TA – TA">66TA – TA</option>
+          <option value="66BP – Bon Pinjam">66BP – Bon Pinjam</option>
+          <option value="66CM – Catalyst Chemical">66CM – Catalyst Chemical</option>
+          <option value="LAINNYA">Lainnya (Ketik Manual)</option>
+        </select>
+        <input type="text" class="form-control" id="f-sloc-custom" style="display:none; margin-top: 6px;" placeholder="Ketik SLoc manual...">
       </div>
       <div class="form-group">
         <label>Harga Satuan (Rp)</label>
@@ -1391,8 +1536,9 @@ function doPost(e) {
       <div class="form-group">
         <label>Status</label>
         <select class="form-control" id="f-status">
-          <option value="PROCESS">PROCESS</option>
-          <option value="WAITING GI STO">WAITING GI STO</option>
+          <option value="WAITING WO">WAITING WO</option>
+          <option value="WAITING RESERVASI">WAITING RESERVASI</option>
+          <option value="WAITING GOODS ISSUE">WAITING GOODS ISSUE</option>
           <option value="WAITING PO STO">WAITING PO STO</option>
           <option value="CLOSED">CLOSED</option>
         </select>
@@ -1606,12 +1752,18 @@ function submitPassword() {
   }
 }
 
-function navigate(page, el) {
+let activeKlasifikasi = 'ALL';
+
+function navigate(page, el, klasifikasi) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   if(el) el.classList.add('active');
-  if(page==='data') filterTable();
+  
+  if(page==='data') {
+    if(klasifikasi) { activeKlasifikasi = klasifikasi; }
+    filterTable();
+  }
   if(page==='outstanding') renderOGI();
   if(page==='approval') renderApproval();
   if(page==='arsip') renderArsip();
@@ -1648,7 +1800,10 @@ function openModal(idx) {
   if(editIndex === -1) {
     document.getElementById('modal-title').textContent = 'Tambah Bon Pinjam Baru';
     clearForm();
-    document.getElementById('f-noreg').value = genReg();
+    if (activeKlasifikasi && activeKlasifikasi !== 'ALL') {
+      document.getElementById('f-klasifikasi').value = activeKlasifikasi;
+    }
+    document.getElementById('f-noreg').value = '';
     document.getElementById('f-tglmiv').value = new Date().toISOString().split('T')[0];
     document.getElementById('f-slagi').value = 14;
   } else {
@@ -1660,21 +1815,62 @@ function closeModal() { document.getElementById('modal-overlay').classList.remov
 function closeModalOutside(e) { if(e.target.id==='modal-overlay') closeModal(); }
 
 function clearForm() {
-  ['kimap','desc','qty','sloc','harga','total','penerima','area','tagno','notif','nogi','ket'].forEach(f => document.getElementById('f-'+f).value='');
+  ['kimap','desc','qty','sloc','harga','total','penerima','area','tagno','notif','nogi','ket'].forEach(f => {
+    if (document.getElementById('f-'+f)) document.getElementById('f-'+f).value='';
+  });
+  if(document.getElementById('f-sloc-custom')) {
+    document.getElementById('f-sloc-custom').value='';
+    document.getElementById('f-sloc-custom').style.display='none';
+  }
+  if(document.getElementById('f-unit-custom')) {
+    document.getElementById('f-unit-custom').value='';
+    document.getElementById('f-unit-custom').style.display='none';
+  }
   document.getElementById('f-unit').value='';
-  document.getElementById('f-status').value='PROCESS';
+  document.getElementById('f-status').value='WAITING WO';
   document.getElementById('f-tglgi').value='';
   document.getElementById('f-noreg').value='';
+  document.getElementById('f-klasifikasi').value='';
 }
 
 function fillForm(row) {
+  document.getElementById('f-klasifikasi').value = row.klasifikasi||'';
   document.getElementById('f-kimap').value = row.kimap||'';
   document.getElementById('f-noreg').value = row.noreg||'';
   document.getElementById('f-desc').value = row.desc||'';
   document.getElementById('f-qty').value = row.qty||'';
   document.getElementById('f-qty-out').value = row.qtyout!==undefined?row.qtyout:'';
-  document.getElementById('f-unit').value = row.unit||'PCS';
-  document.getElementById('f-sloc').value = row.sloc||'';
+  
+  const unitOpts = ["PCS","EA","M","KG","LTR","SET","ROL","BTL","BOX","DRUM"];
+  if (row.unit && unitOpts.includes(row.unit.toUpperCase())) {
+    document.getElementById('f-unit').value = row.unit.toUpperCase();
+    document.getElementById('f-unit-custom').style.display = 'none';
+    document.getElementById('f-unit-custom').value = '';
+  } else if (row.unit) {
+    document.getElementById('f-unit').value = 'LAINNYA';
+    document.getElementById('f-unit-custom').style.display = 'block';
+    document.getElementById('f-unit-custom').value = row.unit;
+  } else {
+    document.getElementById('f-unit').value = '';
+    document.getElementById('f-unit-custom').style.display = 'none';
+    document.getElementById('f-unit-custom').value = '';
+  }
+  
+  const slocOpts = ["66GM – General Material","66IN – Instrument","66IS – Insurance","66OH – Overhaul","66RC – Recondition","66SP – Sparepart","66TA – TA","66BP – Bon Pinjam","66CM – Catalyst Chemical"];
+  if (row.sloc && slocOpts.includes(row.sloc)) {
+    document.getElementById('f-sloc').value = row.sloc;
+    document.getElementById('f-sloc-custom').style.display = 'none';
+    document.getElementById('f-sloc-custom').value = '';
+  } else if (row.sloc) {
+    document.getElementById('f-sloc').value = 'LAINNYA';
+    document.getElementById('f-sloc-custom').style.display = 'block';
+    document.getElementById('f-sloc-custom').value = row.sloc;
+  } else {
+    document.getElementById('f-sloc').value = '';
+    document.getElementById('f-sloc-custom').style.display = 'none';
+    document.getElementById('f-sloc-custom').value = '';
+  }
+  
   document.getElementById('f-harga').value = row.harga||'';
   document.getElementById('f-total').value = formatCurrency(row.total||0);
   document.getElementById('f-penerima').value = row.penerima||'';
@@ -1683,7 +1879,7 @@ function fillForm(row) {
   document.getElementById('f-notif').value = row.notif||'';
   document.getElementById('f-tglmiv').value = row.tglmiv||'';
   document.getElementById('f-ket').value = row.ket||'';
-  document.getElementById('f-status').value = row.status||'PROCESS';
+  document.getElementById('f-status').value = row.status||'WAITING WO';
   document.getElementById('f-nogi').value = row.nogi||'';
   document.getElementById('f-tglgi').value = row.tglgi||'';
   document.getElementById('f-slagi').value = row.slagi||14;
@@ -1696,20 +1892,46 @@ function calcTotal() {
 }
 
 async function saveData() {
-  const required = [['f-kimap','KIMAP'],['f-desc','Material Description'],['f-qty','Qty MIV'],['f-unit','Unit'],['f-sloc','SLoc'],['f-penerima','Penerima'],['f-area','Area'],['f-tglmiv','Tanggal MIV']];
+  const required = [['f-klasifikasi','Klasifikasi Material'],['f-kimap','KIMAP'],['f-noreg','No. Reservasi'],['f-desc','Material Description'],['f-qty','Qty MIV'],['f-qty-out','Jumlah Dikeluarkan'],['f-unit','Unit'],['f-penerima','Penerima'],['f-area','Area'],['f-tglmiv','Tanggal MIV']];
   for(const [id,label] of required) {
     if(!document.getElementById(id).value.trim()) { showToast('Field "'+label+'" wajib diisi!','error'); return; }
   }
+  
+  let slocVal = document.getElementById('f-sloc').value;
+  if(slocVal === 'LAINNYA') {
+    slocVal = document.getElementById('f-sloc-custom').value.trim();
+    if(!slocVal) { showToast('Field "SLoc (Manual)" wajib diisi!','error'); return; }
+  } else if (!slocVal) {
+    showToast('Field "SLoc" wajib diisi!','error'); return;
+  }
+  
+  let unitVal = document.getElementById('f-unit').value;
+  if(unitVal === 'LAINNYA') {
+    unitVal = document.getElementById('f-unit-custom').value.trim().toUpperCase();
+    if(!unitVal) { showToast('Field "Unit (Manual)" wajib diisi!','error'); return; }
+  } else if (!unitVal) {
+    showToast('Field "Unit" wajib diisi!','error'); return;
+  }
+  
   const qty = parseFloat(document.getElementById('f-qty').value)||0;
   const harga = parseFloat(document.getElementById('f-harga').value)||0;
+  
+  let statusVal = document.getElementById('f-status').value;
+  const nogiVal = document.getElementById('f-nogi').value.trim();
+  // Auto-close if GI is filled
+  if (nogiVal && statusVal !== 'CLOSED') {
+    statusVal = 'CLOSED';
+  }
+
   const row = {
+    klasifikasi: document.getElementById('f-klasifikasi').value.trim(),
     kimap: document.getElementById('f-kimap').value.trim(),
     noreg: document.getElementById('f-noreg').value.trim(),
     desc: document.getElementById('f-desc').value.trim(),
     qty: qty,
     qtyout: document.getElementById('f-qty-out').value ? parseFloat(document.getElementById('f-qty-out').value) : '',
-    unit: document.getElementById('f-unit').value,
-    sloc: document.getElementById('f-sloc').value.trim(),
+    unit: unitVal,
+    sloc: slocVal,
     harga: harga,
     total: qty * harga,
     penerima: document.getElementById('f-penerima').value.trim(),
@@ -1718,8 +1940,8 @@ async function saveData() {
     notif: document.getElementById('f-notif').value.trim(),
     tglmiv: document.getElementById('f-tglmiv').value,
     ket: document.getElementById('f-ket').value.trim(),
-    status: document.getElementById('f-status').value,
-    nogi: document.getElementById('f-nogi').value.trim(),
+    status: statusVal,
+    nogi: nogiVal,
     tglgi: document.getElementById('f-tglgi').value,
     slagi: parseInt(document.getElementById('f-slagi').value)||14,
     tglentry: new Date().toISOString()
@@ -1779,13 +2001,15 @@ function saveLocal() { localStorage.setItem('bonpinjam_data', JSON.stringify(dat
 function filterTable() {
   const q = document.getElementById('search-input').value.toLowerCase();
   const fs = document.getElementById('filter-status').value;
-  const fa = document.getElementById('filter-area').value;
+  const fklas = document.getElementById('filter-klasifikasi').value;
   const fm = document.getElementById('filter-month').value;
   const fy = document.getElementById('filter-year').value;
+  
   filteredData = data.filter(r => {
+    if(activeKlasifikasi !== 'ALL' && activeKlasifikasi && r.klasifikasi !== activeKlasifikasi) return false;
+    if(fklas && r.klasifikasi !== fklas) return false;
     if(q && !Object.values(r).some(v => String(v).toLowerCase().includes(q))) return false;
     if(fs && r.status !== fs) return false;
-    if(fa && r.area !== fa) return false;
     if(fm && r.tglmiv && String(new Date(r.tglmiv).getMonth() + 1) !== fm) return false;
     if(fy && r.tglmiv && String(new Date(r.tglmiv).getFullYear()) !== fy) return false;
     return true;
@@ -1797,7 +2021,7 @@ function filterTable() {
 function resetFilters() {
   document.getElementById('search-input').value='';
   document.getElementById('filter-status').value='';
-  document.getElementById('filter-area').value='';
+  document.getElementById('filter-klasifikasi').value= activeKlasifikasi === 'ALL' ? '' : activeKlasifikasi;
   document.getElementById('filter-month').value='';
   document.getElementById('filter-year').value='';
   filterTable();
@@ -1810,8 +2034,13 @@ function sortTable(col) {
 }
 
 function renderTable() {
-  if(!filteredData.length && !document.getElementById('search-input').value &&
-     !document.getElementById('filter-status').value) filteredData = [...data];
+  if(!filteredData.length && !document.getElementById('search-input').value && !document.getElementById('filter-klasifikasi').value && !document.getElementById('filter-month').value && !document.getElementById('filter-year').value &&
+     !document.getElementById('filter-status').value) {
+     filteredData = [...data];
+     if(activeKlasifikasi !== 'ALL' && activeKlasifikasi) {
+       filteredData = filteredData.filter(r => r.klasifikasi === activeKlasifikasi);
+     }
+  }
   
   // Sort
   filteredData.sort((a,b) => {
@@ -1826,7 +2055,7 @@ function renderTable() {
   const tbody = document.getElementById('table-body');
   
   if(!filteredData.length) {
-    tbody.innerHTML = '<tr><td colspan="20" class="table-no-data">Tidak ada data yang cocok dengan filter.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="22" class="table-no-data">Tidak ada data yang cocok dengan filter.</td></tr>';
     document.getElementById('page-info').textContent = 'Menampilkan 0 dari 0 data';
     document.getElementById('pagination').innerHTML = '';
     return;
@@ -1840,6 +2069,7 @@ function renderTable() {
     const slaClass = slaPct < 60 ? 'sla-ok' : slaPct < 90 ? 'sla-warn' : 'sla-over';
     return `<tr>
       <td>${start+i+1}</td>
+      <td><span style="font-size:11px;font-weight:600;color:var(--slate-600);white-space:nowrap;">${r.klasifikasi||'-'}</span></td>
       <td><code style="font-family:var(--mono);font-size:11px;background:var(--slate-100);padding:2px 5px;border-radius:4px;">${r.kimap||'-'}</code></td>
       <td class="wrap" style="min-width:140px;">${r.desc||'-'}</td>
       <td style="text-align:right;font-variant-numeric:tabular-nums;">${r.qty||0}</td>
@@ -1904,7 +2134,7 @@ function goPage(p) {
    OUTSTANDING GI
 ════════════════════════════════════════ */
 function renderOGI() {
-  const ogiData = data.filter(r => r.status === 'PROCESS' || r.status === 'WAITING GI STO');
+  const ogiData = data.filter(r => r.status !== 'CLOSED');
   let aman=0, warn=0, over=0;
   const rows = ogiData.map((r,i) => {
     const aging = r.tglmiv ? Math.floor((new Date()-new Date(r.tglmiv))/(1000*60*60*24)) : 0;
@@ -1913,6 +2143,7 @@ function renderOGI() {
     if(aging <= Math.floor(sla*0.5)) { slaLabel='AMAN'; slaClass='badge-closed'; aman++; }
     else if(aging <= sla) { slaLabel='WARNING'; slaClass='badge-waiting'; warn++; }
     else { slaLabel='OVER SLA'; slaClass='badge-overdue'; over++; }
+    const realIdx = data.indexOf(r);
     return `<tr>
       <td>${i+1}</td>
       <td class="wrap">${r.desc||'-'}</td>
@@ -1924,9 +2155,15 @@ function renderOGI() {
       <td><span class="badge ${slaClass}">${slaLabel}</span></td>
       <td style="text-align:right;">${formatCurrency(r.total||0)}</td>
       <td>${r.ket||'-'}</td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-outline btn-sm" onclick="openModal(${realIdx})" title="Edit">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteData(${realIdx})" title="Hapus">🗑️</button>
+        </div>
+      </td>
     </tr>`;
   });
-  document.getElementById('ogi-body').innerHTML = rows.length ? rows.join('') : '<tr><td colspan="10" class="table-no-data">Tidak ada outstanding GI.</td></tr>';
+  document.getElementById('ogi-body').innerHTML = rows.length ? rows.join('') : '<tr><td colspan="11" class="table-no-data">Tidak ada outstanding GI.</td></tr>';
   document.getElementById('ogi-aman').textContent = aman;
   document.getElementById('ogi-warn').textContent = warn;
   document.getElementById('ogi-over').textContent = over;
@@ -1974,7 +2211,7 @@ async function setAppr(idx, role, val) {
     
     // Auto status update if fully approved or minimum met (e.g., Officer Approved)
     if (val === 'APPROVED' && role === 'officer' && data[idx].status.includes('WAITING PO')) {
-        data[idx].status = 'WAITING GI STO';
+        data[idx].status = 'WAITING GOODS ISSUE';
     }
     
     saveLocal();
@@ -2133,7 +2370,7 @@ function renderArsip() {
 
   const tbody = document.getElementById('arsip-body');
   if (tbody) {
-    tbody.innerHTML = rowHtml || '<tr><td colspan="6" class="table-no-data">Belum ada data arsip. Pastikan Bon Pinjam telah memiliki Nomor Registrasi (No Reg).</td></tr>';
+    tbody.innerHTML = rowHtml || '<tr><td colspan="6" class="table-no-data">Belum ada data arsip. Pastikan Bon Pinjam telah memiliki Nomor Reservasi (No Reservasi).</td></tr>';
   }
 }
 
@@ -2217,10 +2454,10 @@ function refreshTrendChart() {
 
 function refreshDashboard() {
   const total = data.length;
-  const open = data.filter(r=>r.status==='PROCESS').length;
+  const open = data.filter(r=>r.status==='WAITING WO'||r.status==='WAITING RESERVASI').length;
   const closed = data.filter(r=>r.status==='CLOSED').length;
-  const ogi = data.filter(r=>r.status==='PROCESS'||r.status==='WAITING GI STO').length;
-  const waiting = data.filter(r=>r.status==='WAITING PO STO'||r.status==='WAITING GI STO').length;
+  const ogi = data.filter(r=>r.status!=='CLOSED').length;
+  const waiting = data.filter(r=>r.status==='WAITING PO STO'||r.status==='WAITING GOODS ISSUE').length;
   const overdue = 0; // Removing overdue calculation
   const totalQty = data.reduce((s,r)=>s+(r.qty||0),0);
   const totalNilai = data.reduce((s,r)=>s+(r.total||0),0);
@@ -2234,7 +2471,10 @@ function refreshDashboard() {
   document.getElementById('kpi-nilai').textContent = formatCurrency(totalNilai);
   document.getElementById('banner-total-item').textContent = total;
   document.getElementById('banner-total-nilai').textContent = formatCurrency(totalNilai);
-  document.getElementById('badge-open').textContent = open;
+  
+  // Data Bon Pinjam now only shows "CLOSED", so badge reflects closed items.
+  document.getElementById('badge-open').textContent = closed;
+  // Outstanding GI badge reflects all non-CLOSED items.
   document.getElementById('badge-ogi').textContent = ogi;
 
   // Activity feed
@@ -2243,7 +2483,7 @@ function refreshDashboard() {
   if(recent.length) {
     feed.innerHTML = recent.map(r => `
       <div class="activity-item">
-        <div class="act-dot ${(r.status||'').toLowerCase().replace(' ','-').includes('close')?'closed':r.status==='PROCESS'?'process':'waiting'}"></div>
+        <div class="act-dot ${(r.status||'').toLowerCase().replace(' ','-').includes('close')?'closed':(r.status==='WAITING WO'||r.status==='WAITING RESERVASI')?'process':'waiting'}"></div>
         <div>
           <div class="act-text"><strong>${r.penerima||'-'}</strong> — ${r.desc||'-'} (${r.qty||0} ${r.unit||'PCS'})</div>
           <div class="act-time">${r.area||''} · ${statusBadge(r.status)} · ${r.noreg||'-'} · ${formatDate(r.tglmiv)}</div>
@@ -2258,7 +2498,7 @@ function refreshDashboard() {
   // Status Pie
   if(statusChart) statusChart.destroy();
   const sc = document.getElementById('chart-status').getContext('2d');
-  const sLabels = ['PROCESS','WAITING GI STO','WAITING PO STO','CLOSED'];
+  const sLabels = ['WAITING WO','WAITING RESERVASI','WAITING GOODS ISSUE','WAITING PO STO','CLOSED'];
   const sCounts = sLabels.map(s => data.filter(r=>r.status===s).length);
   statusChart = new Chart(sc, {
     type: 'doughnut',
@@ -2312,10 +2552,10 @@ function refreshDashboard() {
 ════════════════════════════════════════ */
 function statusBadge(s) {
   const map = {
-    'PROCESS':'badge-open','CLOSED':'badge-closed',
-    'WAITING GI STO':'badge-wgi','WAITING PO STO':'badge-waiting'
+    'WAITING WO':'badge-open', 'WAITING RESERVASI':'badge-open','CLOSED':'badge-closed',
+    'WAITING GOODS ISSUE':'badge-wgi','WAITING PO STO':'badge-waiting'
   };
-  return `<span class="badge ${map[s]||'badge-open'}">${s||'PROCESS'}</span>`;
+  return `<span class="badge ${map[s]||'badge-open'}">${s||'WAITING WO'}</span>`;
 }
 
 function formatCurrency(n) {
@@ -2340,7 +2580,7 @@ function refreshAll() {
 
 function refreshFilterOptions() {
   const areas = [...new Set(data.map(r=>r.area).filter(Boolean))].sort();
-  ['filter-area','rpt-area'].forEach(id => {
+  ['rpt-area'].forEach(id => {
     const sel = document.getElementById(id);
     if(!sel) return;
     const cur = sel.value;
@@ -2376,8 +2616,8 @@ function getFilteredForReport() {
 function exportExcel() {
   const d = getFilteredForReport();
   if(!d.length) { showToast('Tidak ada data untuk diekspor.','error'); return; }
-  const headers = ['No','KIMAP','Material Description','Qty MIV','Jumlah Dikeluarkan','Unit','SLoc','Harga Satuan','Total Nilai','Penerima','Area','Tag Number','NOTIF/WO/PO STO','Tgl MIV','No Reg','Keterangan','Status','Nomor GI','Tgl GI','SLA GI'];
-  const rows = d.map((r,i) => [i+1,r.kimap,r.desc,r.qty,r.qtyout,r.unit,r.sloc,r.harga,r.total,r.penerima,r.area,r.tagno,r.notif,r.tglmiv,r.noreg,r.ket,r.status,r.nogi,r.tglgi,r.slagi]);
+  const headers = ['No','Klasifikasi','KIMAP','Material Description','Qty MIV','Jumlah Dikeluarkan','Unit','SLoc','Harga Satuan','Total Nilai','Penerima','Area','Tag Number','NOTIF/WO/PO STO','Tgl MIV','No Reservasi','Keterangan','Status','Nomor GI','Tgl GI','SLA GI'];
+  const rows = d.map((r,i) => [i+1,r.klasifikasi,r.kimap,r.desc,r.qty,r.qtyout,r.unit,r.sloc,r.harga,r.total,r.penerima,r.area,r.tagno,r.notif,r.tglmiv,r.noreg,r.ket,r.status,r.nogi,r.tglgi,r.slagi]);
   const ws = XLSX.utils.aoa_to_sheet([headers,...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'BonPinjam');
@@ -2416,7 +2656,7 @@ function exportSLA() {
 }
 
 function exportApproval() {
-  const headers = ['No Reg','Material','Penerima','Area','Tgl Bon','Status Approval'];
+  const headers = ['No Reservasi','Material','Penerima','Area','Tgl Bon','Status Approval'];
   const rows = data.map(r=>[r.noreg,r.desc,r.penerima,r.area,r.tglmiv,r.status]);
   const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
   const wb=XLSX.utils.book_new();
@@ -2427,8 +2667,8 @@ function exportApproval() {
 
 function printTable() {
   const printWin = window.open('','','width=1200,height=800');
-  const rows = (filteredData.length?filteredData:data).map((r,i)=>`<tr>
-    <td>${i+1}</td><td>${r.kimap||'-'}</td><td>${r.desc||'-'}</td><td>${r.qty||0}</td><td>${r.qtyout!==undefined&&r.qtyout!==''?r.qtyout:'-'}</td>
+  const rows = filteredData.map((r,i)=>`<tr>
+    <td>${i+1}</td><td>${r.klasifikasi||'-'}</td><td>${r.kimap||'-'}</td><td>${r.desc||'-'}</td><td>${r.qty||0}</td><td>${r.qtyout!==undefined&&r.qtyout!==''?r.qtyout:'-'}</td>
     <td>${r.unit||'-'}</td><td>${r.sloc||'-'}</td><td>Rp ${(r.harga||0).toLocaleString('id-ID')}</td>
     <td>Rp ${(r.total||0).toLocaleString('id-ID')}</td><td>${r.penerima||'-'}</td><td>${r.area||'-'}</td>
     <td>${r.tagno||'-'}</td><td>${r.notif||'-'}</td><td>${r.tglmiv||'-'}</td><td>${r.noreg||'-'}</td>
@@ -2440,9 +2680,9 @@ function printTable() {
   th{background:#1E293B;color:white;font-size:10px;}</style></head><body>
   <h2>BON PINJAM MATERIAL RUTIN 2026</h2>
   <p>Dicetak: ${new Date().toLocaleString('id-ID')}</p>
-  <table><thead><tr><th>No</th><th>KIMAP</th><th>Material</th><th>Qty MIV</th><th>Jumlah Dikeluarkan</th><th>Unit</th>
+  <table><thead><tr><th>No</th><th>Klasifikasi</th><th>KIMAP</th><th>Material</th><th>Qty MIV</th><th>Jumlah Dikeluarkan</th><th>Unit</th>
   <th>SLoc</th><th>Harga</th><th>Total</th><th>Penerima</th><th>Area</th>
-  <th>Tag No</th><th>NOTIF/WO</th><th>Tgl MIV</th><th>No Reg</th><th>Status</th><th>No GI</th><th>Tgl GI</th>
+  <th>Tag No</th><th>NOTIF/WO</th><th>Tgl MIV</th><th>No Reservasi</th><th>Status</th><th>No GI</th><th>Tgl GI</th>
   </tr></thead><tbody>${rows}</tbody></table></body></html>`);
   printWin.document.close();
   printWin.print();
@@ -2811,18 +3051,44 @@ function updateSyncStatus() {
   }
 }
 
+function proxyRequest(url, method = 'GET', body = null) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const res = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ url, method, body })
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        let parsed;
+        try { parsed = JSON.parse(text); } catch(err) {}
+        throw new Error(parsed?.error || text || 'Gagal terhubung ke proxy local.');
+      }
+      const json = await res.json();
+      resolve(json);
+    } catch(err) {
+      reject(err);
+    }
+  });
+}
+
 async function testConnection() {
   const url = document.getElementById('apps-script-url').value.trim() || SETTINGS.appsScriptUrl;
   if(!url || !url.startsWith('https://script.google.com/')) { showToast('URL Apps Script tidak valid (harus https://script.google.com/...)','error'); return; }
   const res = document.getElementById('conn-result');
   res.innerHTML = '<span style="color:var(--slate-500);">🔄 Testing koneksi...</span>';
   try {
-    const r = await fetch(url+'?action=ping', {mode:'no-cors'});
-    res.innerHTML = '<span style="color:var(--green-600);">✅ Koneksi berhasil! (no-cors mode — pastikan script aktif)</span>';
+    const json = await proxyRequest(url + '?action=ping', 'GET');
+    if(json.error) throw new Error(json.error);
+    res.innerHTML = '<span style="color:var(--green-600);">✅ Koneksi berhasil! Script merespons dengan baik.</span>';
     showToast('Koneksi ke Apps Script OK!','success');
   } catch(e) {
-    res.innerHTML = '<span style="color:var(--red-600);">❌ Koneksi gagal: '+e.message+'</span>';
-    showToast('Koneksi gagal: '+e.message,'error');
+    let msg = e.message;
+    res.innerHTML = '<span style="color:var(--red-600);">❌ Koneksi gagal: '+msg+'</span>';
+    showToast('Koneksi gagal: '+msg,'error');
   }
 }
 
@@ -2845,16 +3111,14 @@ async function syncToSheet(row, action) {
     const role = sessionStorage.getItem('bonpinjam_role') || 'Sistem';
     const editorName = `${role} - ${prof.nama || 'Unknown'}`;
     const formattedTglEntry = formatSstDate(row.tglentry);
-    const rowArr = [data.indexOf(row)+1,row.kimap,row.desc,row.qty,row.qtyout !== undefined && row.qtyout !== '' ? row.qtyout : '',row.unit,row.sloc,row.harga,row.total,row.penerima,row.area,row.tagno,row.notif,row.tglmiv,row.noreg,row.ket,row.status,row.nogi,row.tglgi,row.slagi,formattedTglEntry, '', editorName];
-    await fetch(SETTINGS.appsScriptUrl, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type':'text/plain'}, // Prevent CORS OPTIONS preflight
-      body: JSON.stringify({ action, sheetId: SETTINGS.sheetId, sheetName: SETTINGS.sheetName, row: rowArr, noreg: row.noreg })
-    });
+    const rowArr = [data.indexOf(row)+1,row.kimap,row.desc,row.qty,row.qtyout !== undefined && row.qtyout !== '' ? row.qtyout : '',row.unit,row.sloc,row.harga,row.total,row.penerima,row.area,row.tagno,row.notif,row.tglmiv,row.noreg,row.ket,row.status,row.nogi,row.tglgi,row.slagi,formattedTglEntry, '', editorName, row.klasifikasi || ''];
+    const payload = { action, sheetId: SETTINGS.sheetId, sheetName: SETTINGS.sheetName, row: rowArr, noreg: row.noreg };
+    const json = await proxyRequest(SETTINGS.appsScriptUrl, 'POST', payload);
+    if(json.error) throw new Error(json.error);
     showToast('Tersinkronisasi ke Spreadsheet', 'success');
   } catch(e) {
-    showToast('Gagal sinkron Spreadsheet:\n' + e.message, 'error');
+    let msg = e.message;
+    showToast('Gagal sinkron Spreadsheet:\n' + msg, 'error');
     console.warn('Sync error:', e);
   }
 }
@@ -2872,26 +3136,25 @@ async function syncAppToSheet() {
     
     const rows = data.map((row, index) => {
       const formattedTglEntry = formatSstDate(row.tglentry);
-      return [index+1,row.kimap,row.desc,row.qty,row.qtyout !== undefined && row.qtyout !== '' ? row.qtyout : '',row.unit,row.sloc,row.harga,row.total,row.penerima,row.area,row.tagno,row.notif,row.tglmiv,row.noreg,row.ket,row.status,row.nogi,row.tglgi,row.slagi,formattedTglEntry, '', editorName];
+      return [index+1,row.kimap,row.desc,row.qty,row.qtyout !== undefined && row.qtyout !== '' ? row.qtyout : '',row.unit,row.sloc,row.harga,row.total,row.penerima,row.area,row.tagno,row.notif,row.tglmiv,row.noreg,row.ket,row.status,row.nogi,row.tglgi,row.slagi,formattedTglEntry, '', editorName, row.klasifikasi || ''];
     });
 
-    await fetch(SETTINGS.appsScriptUrl, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type':'text/plain'},
-      body: JSON.stringify({ 
-        action: 'sync_all', 
-        sheetId: SETTINGS.sheetId, 
-        sheetName: SETTINGS.sheetName, 
-        rows: rows 
-      })
-    });
+    const payload = { 
+      action: 'sync_all', 
+      sheetId: SETTINGS.sheetId, 
+      sheetName: SETTINGS.sheetName, 
+      rows: rows 
+    };
+    const json = await proxyRequest(SETTINGS.appsScriptUrl, 'POST', payload);
+    if (json.error) throw new Error(json.error);
+
     hideLoading();
     showToast('Semua data berhasil diupload ke Spreadsheet!', 'success');
   } catch(e) {
     hideLoading();
-    showToast('Upload gagal: ' + e.message, 'error');
-    console.error(e);
+    let msg = e.message;
+    showToast('Upload gagal: ' + msg, 'error');
+    console.warn(e);
   }
 }
 
@@ -2904,8 +3167,7 @@ async function syncFromSheet(silent = false) {
   if(!silent) showLoading('Mendownload data dari Spreadsheet...');
   try {
     const url = `${SETTINGS.appsScriptUrl}?id=${encodeURIComponent(SETTINGS.sheetId)}&sheet=${encodeURIComponent(SETTINGS.sheetName)}`;
-    const res = await fetch(url);
-    const json = await res.json();
+    const json = await proxyRequest(url, 'GET');
     
     if (json.error) {
        if(!silent) {
@@ -2913,13 +3175,14 @@ async function syncFromSheet(silent = false) {
          showToast('Spreadsheet Error: ' + json.error, 'error');
          alert('Gagal mengambil data Spreadsheet:\n\n' + json.error + '\n\nPastikan ID Spreadsheet benar dan hak aksesnya sudah tepat.');
        }
-       console.error('Spreadsheet error:', json.error);
+       console.warn('Spreadsheet error:', json.error);
        return;
     }
 
     if(json.data && Array.isArray(json.data)) {
       const headers = json.headers||[];
       const keyMap = {
+        'klasifikasi material':'klasifikasi','klasifikasi':'klasifikasi',
         'kimap':'kimap','material description':'desc','qty miv':'qty','jumlah dikeluarkan':'qtyout','unit':'unit','sloc':'sloc',
         'harga satuan':'harga','total nilai':'total','penerima':'penerima','area':'area',
         'tag number':'tagno','notif/wo/po sto':'notif','tgl miv':'tglmiv','no reg':'noreg',
@@ -2961,15 +3224,16 @@ async function syncFromSheet(silent = false) {
       refreshAll();
     }
   } catch(e) {
+    let msg = e.message;
     if(!silent) {
       hideLoading();
-      if(e.message.includes('fetch') || e.message.includes('NetworkError') || e.message.includes('CORS')) {
-        showToast('Update Failed', 'error');
-        alert('PENTING: Sync Gagal (CORS Error).\n\nPenyebab:\nGoogle Apps Script Anda tidak dideploy dengan hak akses "Anyone".\n\nSolusi:\n1. Buka kembali Google Apps Script.\n2. Klik "Deploy" > "Manage deployments" (atau "New deployment").\n3. Pastikan "Who has access" adalah "Anyone".\n4. Simpan, copy ulang Web App URL-nya, lalu paste di PENGATURAN SPREADSHEET.');
-      } else {
-        showToast('Update Failed', 'error');
+      showToast('Sinkronisasi Gagal: ' + msg, 'error');
+      if(msg.includes('Koneksi diblokir') || msg.includes('Google') || msg.includes('fetch') || msg.includes('proxy')) {
+        alert('PENTING: Sinkronisasi Gagal!\n\nPenyebab:\nURL Google Apps Script Anda memblokir koneksi atau mengembalikan error.\n\nSolusi:\n1. Buka Apps Script.\n2. Klik "Deploy" > "Manage deployments".\n3. Pastikan "Who has access" adalah "Anyone" (Bukan hanya organisasi Anda).\n4. Jika sudah "Anyone" tapi masih gagal, pastikan Spreadsheet ID dan URL Script yang Anda masukkan sudah benar.');
       }
-      console.error(e);
+      console.warn('syncFromSheet Error:', msg, e);
+    } else {
+      console.warn('Background sync warning:', msg);
     }
   }
 }
