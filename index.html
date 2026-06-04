@@ -3185,13 +3185,28 @@ async function syncFromSheet(silent = false) {
         'klasifikasi material':'klasifikasi','klasifikasi':'klasifikasi',
         'kimap':'kimap','material description':'desc','qty miv':'qty','jumlah dikeluarkan':'qtyout','unit':'unit','sloc':'sloc',
         'harga satuan':'harga','total nilai':'total','penerima':'penerima','area':'area',
-        'tag number':'tagno','notif/wo/po sto':'notif','tgl miv':'tglmiv','no reg':'noreg',
-        'keterangan':'ket','status':'status','nomor gi':'nogi','tgl gi':'tglgi','sla gi':'slagi'
+        'tag number':'tagno','notif/wo/po sto':'notif','tgl miv':'tglmiv','no reservasi':'noreg','no reg':'noreg',
+        'keterangan':'ket','status':'status','nomor gi':'nogi','tgl gi':'tglgi','sla gi':'slagi','tgl entry':'tglentry'
       };
       
       const newData = json.data.map(row => {
         const obj = {};
-        Object.entries(row).forEach(([k,v]) => { const key=keyMap[k.toLowerCase().trim()]; if(key) obj[key]=v; });
+        Object.entries(row).forEach(([k,v]) => {
+          const key=keyMap[k.toLowerCase().trim()];
+          if(key) {
+            if (key === 'qty' || key === 'harga' || key === 'total') {
+              obj[key] = (v !== '' && v !== null && v !== undefined) ? (parseFloat(v) || 0) : 0;
+            } else if (key === 'qtyout') {
+              obj[key] = (v !== '' && v !== null && v !== undefined) ? (parseFloat(v) || 0) : '';
+            } else if (key === 'slagi') {
+              obj[key] = (v !== '' && v !== null && v !== undefined) ? (parseInt(v) || 14) : 14;
+            } else if (v === null || v === undefined) {
+              obj[key] = '';
+            } else {
+              obj[key] = String(v).trim();
+            }
+          }
+        });
         if(!obj.tglentry) obj.tglentry = new Date().toISOString();
         return obj;
       }).filter(r => r.kimap||r.desc);
