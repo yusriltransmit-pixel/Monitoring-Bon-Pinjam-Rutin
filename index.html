@@ -2484,9 +2484,13 @@
                   Berhasil</strong
                 ><br />
                 Saat melakukan
-                <strong style="text-decoration: underline">New Deployment</strong>
+                <strong style="text-decoration: underline"
+                  >New Deployment</strong
+                >
                 di Google Apps Script, perhatikan dua hal ini:<br />
-                <ol style="margin-top: 8px; margin-bottom: 0; padding-left: 20px">
+                <ol
+                  style="margin-top: 8px; margin-bottom: 0; padding-left: 20px"
+                >
                   <li>Execute as: Pilih <strong>Me</strong></li>
                   <li>
                     Who has access: <strong>Wajib pilih "Anyone"</strong> (Jika
@@ -2495,7 +2499,7 @@
                   </li>
                 </ol>
               </div>
-  
+
               <div class="form-group" style="margin-bottom: 14px">
                 <label>Google Spreadsheet ID</label>
                 <input
@@ -2549,7 +2553,7 @@
                   ditulis dan dibaca.</span
                 >
               </div>
-  
+
               <div
                 style="
                   background: var(--amber-50);
@@ -2579,7 +2583,7 @@
                   <li>Copy URL dan paste di field di atas</li>
                 </ol>
               </div>
-  
+
               <div class="form-group" style="margin-bottom: 18px">
                 <label
                   >Kode Google Apps Script (Copy & Paste ke Apps Script
@@ -2736,12 +2740,17 @@ function doPost(e) {
   }
 }
           </textarea
-              >
+                >
+              </div>
             </div>
-            </div> <!-- CLOSE manual-config-section -->
+            <!-- CLOSE manual-config-section -->
 
             <div style="display: flex; gap: 10px; flex-wrap: wrap">
-              <button class="btn btn-primary" id="btn-save-settings" onclick="saveSettings()">
+              <button
+                class="btn btn-primary"
+                id="btn-save-settings"
+                onclick="saveSettings()"
+              >
                 Simpan Pengaturan
               </button>
               <button class="btn btn-outline" onclick="testConnection()">
@@ -6328,31 +6337,7 @@ function doPost(e) {
         SETTINGS.appsScriptUrl = urlVal;
         localStorage.setItem("bonpinjam_settings", JSON.stringify(SETTINGS));
 
-        // Save settings dynamically to backend config file as well!
-        try {
-          const res = await fetch("/api/config", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              spreadsheetId: SETTINGS.sheetId,
-              appsScriptUrl: SETTINGS.appsScriptUrl,
-              sheetName: SETTINGS.sheetName,
-            }),
-          });
-          const result = await res.json();
-          if (result.error) throw new Error(result.error);
-          showToast(
-            "Pengaturan disimpan ke Browser dan file /config/googleConfig.json!",
-            "success",
-          );
-        } catch (err) {
-          console.error("Gagal menyimpan ke config file:", err);
-          showToast(
-            "Pengaturan disimpan di browser, tapi gagal menulis ke file config: " +
-              err.message,
-            "warn",
-          );
-        }
+        showToast("Pengaturan berhasil disimpan!", "success");
 
         startAutoSync();
       }
@@ -6373,15 +6358,15 @@ function doPost(e) {
           sheetNameInput.disabled = !!PATENT_SHEET_NAME;
           appsScriptUrlInput.disabled = !!PATENT_WEB_APP_URL;
 
-          if(manualSection) manualSection.style.display = 'none';
-          if(btnSave) btnSave.style.display = 'none';
+          if (manualSection) manualSection.style.display = "none";
+          if (btnSave) btnSave.style.display = "none";
         } else {
           sheetIdInput.value = SETTINGS.sheetId || "";
           sheetNameInput.value = SETTINGS.sheetName || "BonPinjam";
           appsScriptUrlInput.value = SETTINGS.appsScriptUrl || "";
-          
-          if(manualSection) manualSection.style.display = 'block';
-          if(btnSave) btnSave.style.display = 'inline-block';
+
+          if (manualSection) manualSection.style.display = "block";
+          if (btnSave) btnSave.style.display = "inline-block";
         }
         updateSyncStatus();
       }
@@ -6971,27 +6956,13 @@ function doPost(e) {
       }
 
       document.addEventListener("DOMContentLoaded", async () => {
-        // Fetch configuration dynamically from config/googleConfig.json via backend API
-        try {
-          const resValue = await fetch("/api/config");
-          const configData = await resValue.json();
-          if (
-            configData &&
-            configData.spreadsheetId &&
-            configData.appsScriptUrl
-          ) {
-            SETTINGS.sheetId = PATENT_SHEET_ID || configData.spreadsheetId;
-            SETTINGS.appsScriptUrl =
-              PATENT_WEB_APP_URL || configData.appsScriptUrl;
-            SETTINGS.sheetName =
-              PATENT_SHEET_NAME || configData.sheetName || "BonPinjam";
-            localStorage.setItem(
-              "bonpinjam_settings",
-              JSON.stringify(SETTINGS),
-            );
-          }
-        } catch (error) {
-          console.error("Gagal memuat konfigurasi Google dari server:", error);
+        // Gunakan PATENT_SHEET_ID dan URL yang sudah di-hardcode di bagian atas file
+        // Agar bisa langsung terhubung tanpa fetch dari backend saat di-deploy (Vercel/GitHub Pages)
+        if (PATENT_SHEET_ID && PATENT_WEB_APP_URL) {
+          SETTINGS.sheetId = PATENT_SHEET_ID;
+          SETTINGS.appsScriptUrl = PATENT_WEB_APP_URL;
+          SETTINGS.sheetName = PATENT_SHEET_NAME || "BonPinjam";
+          localStorage.setItem("bonpinjam_settings", JSON.stringify(SETTINGS));
         }
 
         checkLoginSession();
