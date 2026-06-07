@@ -2460,20 +2460,10 @@
                 <path d="M11.3 13.7l-.7.7" />
               </svg>
               <div>
-                <strong>💾 Penyimpanan Terpusat & Persisten</strong><br />
-                Pengaturan ini tersimpan secara fisik di file
-                <code
-                  style="
-                    font-family: var(--mono);
-                    background: var(--white);
-                    padding: 1px 4px;
-                    border-radius: 4px;
-                    font-size: 12px;
-                    border: 1px solid var(--slate-200);
-                  "
-                  >/config/googleConfig.json</code
-                >. Anda dapat mengedit file tersebut langsung di codebase agar
-                tidak ter-reset atau hilang saat melakukan deployment ulang.
+                <strong>🔒 Terkunci Otomatis (Sistem)</strong><br />
+                Pengaturan Google Spreadsheet ID dan Web App URL telah terkunci
+                otomatis oleh sistem agar tersimpan permanen, tidak berubah
+                ketika di deploy, dan langsung terhubung.
               </div>
             </div>
 
@@ -4248,8 +4238,9 @@ function doPost(e) {
       let sortDir = "desc";
       let filteredData = [];
 
-      const PATENT_SHEET_ID = ""; // ISO JIKA INGIN PATENT: Ganti dengan ID Spreadsheet ("1BxiM...")
-      const PATENT_WEB_APP_URL = ""; // ISI JIKA INGIN PATENT: Ganti dengan Web App URL ("https://script.google.com/macros/...")
+      const PATENT_SHEET_ID = "11rLatTqbJPyX65KQ6br6JulfL3nOoaOn8zPB3dpb88g";
+      const PATENT_WEB_APP_URL =
+        "https://script.google.com/macros/s/AKfycbytufiRRixQeetLPNJLwPZAeUFEV_epwtBhCc8ahREsK2u2m_jpLvhC1f-V57q82tMW/exec";
       const PATENT_SHEET_NAME = "BonPinjam";
 
       let SETTINGS = JSON.parse(
@@ -6295,7 +6286,7 @@ function doPost(e) {
       async function saveSettings() {
         if (PATENT_SHEET_ID || PATENT_WEB_APP_URL) {
           showToast(
-            "Pengaturan patent aktif! Edit file /config/googleConfig.json untuk mengubah.",
+            "Terkunci otomatis oleh sistem! Pengaturan Google Spreadsheet ID dan Web App URL langsung terhubung.",
             "info",
           );
           return;
@@ -6979,9 +6970,11 @@ function doPost(e) {
             configData.spreadsheetId &&
             configData.appsScriptUrl
           ) {
-            SETTINGS.sheetId = configData.spreadsheetId;
-            SETTINGS.appsScriptUrl = configData.appsScriptUrl;
-            SETTINGS.sheetName = configData.sheetName || "BonPinjam";
+            SETTINGS.sheetId = PATENT_SHEET_ID || configData.spreadsheetId;
+            SETTINGS.appsScriptUrl =
+              PATENT_WEB_APP_URL || configData.appsScriptUrl;
+            SETTINGS.sheetName =
+              PATENT_SHEET_NAME || configData.sheetName || "BonPinjam";
             localStorage.setItem(
               "bonpinjam_settings",
               JSON.stringify(SETTINGS),
