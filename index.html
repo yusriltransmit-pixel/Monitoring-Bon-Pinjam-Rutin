@@ -6386,13 +6386,18 @@ function doPost(e) {
       function proxyRequest(url, method = "GET", body = null) {
         return new Promise(async (resolve, reject) => {
           try {
-            const res = await fetch("/api/proxy", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ url, method, body }),
-            });
+            const options = {
+              method: method,
+              mode: "cors",
+              redirect: "follow",
+              headers: {},
+            };
+            if (method === "POST" && body) {
+              options.body = JSON.stringify(body);
+              // Gunakan text/plain agar browser tidak mengirim request OPTIONS (CORS Preflight)
+              options.headers["Content-Type"] = "text/plain;charset=utf-8";
+            }
+            const res = await fetch(url, options);
 
             const text = await res.text();
             let parsed;
@@ -6400,7 +6405,7 @@ function doPost(e) {
               parsed = JSON.parse(text);
             } catch (err) {
               if (!res.ok)
-                throw new Error(text || "Gagal terhubung ke proxy local.");
+                throw new Error(text || "Gagal menghubungi Apps Script.");
               throw new Error(
                 "Respons dari server bukan JSON valid: " +
                   text.substring(0, 100),
@@ -6408,7 +6413,7 @@ function doPost(e) {
             }
 
             if (!res.ok) {
-              throw new Error(parsed?.error || text || "Proxy error.");
+              throw new Error(parsed?.error || text || "Network error.");
             }
 
             resolve(parsed);
