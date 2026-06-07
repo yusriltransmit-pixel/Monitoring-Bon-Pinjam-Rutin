@@ -2467,130 +2467,131 @@
               </div>
             </div>
 
-            <div
-              style="
-                margin-bottom: 24px;
-                padding: 14px;
-                background: #fff3cd;
-                color: #856404;
-                border: 1px solid #ffeeba;
-                border-radius: 6px;
-                font-size: 13px;
-              "
-            >
-              <strong style="font-size: 14px"
-                >🚨 PENTING: Cara Deploy Script yang Benar agar Sync
-                Berhasil</strong
-              ><br />
-              Saat melakukan
-              <strong style="text-decoration: underline">New Deployment</strong>
-              di Google Apps Script, perhatikan dua hal ini:<br />
-              <ol style="margin-top: 8px; margin-bottom: 0; padding-left: 20px">
-                <li>Execute as: Pilih <strong>Me</strong></li>
-                <li>
-                  Who has access: <strong>Wajib pilih "Anyone"</strong> (Jika
-                  tidak "Anyone", Sync akan <strong>GAGAL</strong> atau
-                  nyangkut)
-                </li>
-              </ol>
-            </div>
-
-            <div class="form-group" style="margin-bottom: 14px">
-              <label>Google Spreadsheet ID</label>
-              <input
-                type="text"
-                class="form-control"
-                id="sheet-id"
-                placeholder="Contoh: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
-                value=""
-              />
-              <span
+            <div id="manual-config-section">
+              <div
                 style="
-                  font-size: 11px;
-                  color: var(--slate-400);
-                  margin-top: 4px;
-                "
-                >Ambil dari URL spreadsheet:
-                docs.google.com/spreadsheets/d/<strong>[ID disini]</strong
-                >/edit</span
-              >
-            </div>
-            <div class="form-group" style="margin-bottom: 14px">
-              <label>Nama Sheet (Tab)</label>
-              <input
-                type="text"
-                class="form-control"
-                id="sheet-name"
-                placeholder="Sheet1"
-                value="BonPinjam"
-              />
-            </div>
-            <div class="form-group" style="margin-bottom: 14px">
-              <label
-                >Google Apps Script Web App URL
-                <span style="font-weight: 400; color: var(--slate-400)"
-                  >(untuk read/write)</span
-                ></label
-              >
-              <input
-                type="text"
-                class="form-control"
-                id="apps-script-url"
-                placeholder="https://script.google.com/macros/s/AKfycb.../exec"
-              />
-              <span
-                style="
-                  font-size: 11px;
-                  color: var(--slate-400);
-                  margin-top: 4px;
-                "
-                >Deploy Google Apps Script sebagai Web App agar data bisa
-                ditulis dan dibaca.</span
-              >
-            </div>
-
-            <div
-              style="
-                background: var(--amber-50);
-                border: 1px solid var(--amber-200);
-                border-radius: var(--radius);
-                padding: 12px 16px;
-                margin-bottom: 18px;
-              "
-            >
-              <strong style="font-size: 12px; color: var(--amber-800)"
-                >📌 Cara Setup Google Apps Script:</strong
-              >
-              <ol
-                style="
-                  font-size: 11px;
-                  color: var(--amber-700);
-                  margin-top: 6px;
-                  padding-left: 18px;
-                  line-height: 2;
+                  margin-bottom: 24px;
+                  padding: 14px;
+                  background: #fff3cd;
+                  color: #856404;
+                  border: 1px solid #ffeeba;
+                  border-radius: 6px;
+                  font-size: 13px;
                 "
               >
-                <li>Buka Google Spreadsheet Anda</li>
-                <li>Klik <b>Extensions → Apps Script</b></li>
-                <li>Paste kode Apps Script di bawah, klik Save</li>
-                <li>Klik <b>Deploy → New deployment → Web App</b></li>
-                <li>Set "Execute as: Me", "Who has access: Anyone"</li>
-                <li>Copy URL dan paste di field di atas</li>
-              </ol>
-            </div>
-
-            <div class="form-group" style="margin-bottom: 18px">
-              <label
-                >Kode Google Apps Script (Copy & Paste ke Apps Script
-                Editor)</label
+                <strong style="font-size: 14px"
+                  >🚨 PENTING: Cara Deploy Script yang Benar agar Sync
+                  Berhasil</strong
+                ><br />
+                Saat melakukan
+                <strong style="text-decoration: underline">New Deployment</strong>
+                di Google Apps Script, perhatikan dua hal ini:<br />
+                <ol style="margin-top: 8px; margin-bottom: 0; padding-left: 20px">
+                  <li>Execute as: Pilih <strong>Me</strong></li>
+                  <li>
+                    Who has access: <strong>Wajib pilih "Anyone"</strong> (Jika
+                    tidak "Anyone", Sync akan <strong>GAGAL</strong> atau
+                    nyangkut)
+                  </li>
+                </ol>
+              </div>
+  
+              <div class="form-group" style="margin-bottom: 14px">
+                <label>Google Spreadsheet ID</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="sheet-id"
+                  placeholder="Contoh: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
+                  value=""
+                />
+                <span
+                  style="
+                    font-size: 11px;
+                    color: var(--slate-400);
+                    margin-top: 4px;
+                  "
+                  >Ambil dari URL spreadsheet:
+                  docs.google.com/spreadsheets/d/<strong>[ID disini]</strong
+                  >/edit</span
+                >
+              </div>
+              <div class="form-group" style="margin-bottom: 14px">
+                <label>Nama Sheet (Tab)</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="sheet-name"
+                  placeholder="Sheet1"
+                  value="BonPinjam"
+                />
+              </div>
+              <div class="form-group" style="margin-bottom: 14px">
+                <label
+                  >Google Apps Script Web App URL
+                  <span style="font-weight: 400; color: var(--slate-400)"
+                    >(untuk read/write)</span
+                  ></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="apps-script-url"
+                  placeholder="https://script.google.com/macros/s/AKfycb.../exec"
+                />
+                <span
+                  style="
+                    font-size: 11px;
+                    color: var(--slate-400);
+                    margin-top: 4px;
+                  "
+                  >Deploy Google Apps Script sebagai Web App agar data bisa
+                  ditulis dan dibaca.</span
+                >
+              </div>
+  
+              <div
+                style="
+                  background: var(--amber-50);
+                  border: 1px solid var(--amber-200);
+                  border-radius: var(--radius);
+                  padding: 12px 16px;
+                  margin-bottom: 18px;
+                "
               >
-              <textarea
-                id="gas-code"
-                class="form-control"
-                rows="25"
-                style="font-family: var(--mono); font-size: 11px"
-                readonly
-              >
+                <strong style="font-size: 12px; color: var(--amber-800)"
+                  >📌 Cara Setup Google Apps Script:</strong
+                >
+                <ol
+                  style="
+                    font-size: 11px;
+                    color: var(--amber-700);
+                    margin-top: 6px;
+                    padding-left: 18px;
+                    line-height: 2;
+                  "
+                >
+                  <li>Buka Google Spreadsheet Anda</li>
+                  <li>Klik <b>Extensions → Apps Script</b></li>
+                  <li>Paste kode Apps Script di bawah, klik Save</li>
+                  <li>Klik <b>Deploy → New deployment → Web App</b></li>
+                  <li>Set "Execute as: Me", "Who has access: Anyone"</li>
+                  <li>Copy URL dan paste di field di atas</li>
+                </ol>
+              </div>
+  
+              <div class="form-group" style="margin-bottom: 18px">
+                <label
+                  >Kode Google Apps Script (Copy & Paste ke Apps Script
+                  Editor)</label
+                >
+                <textarea
+                  id="gas-code"
+                  class="form-control"
+                  rows="25"
+                  style="font-family: var(--mono); font-size: 11px"
+                  readonly
+                >
 function doGet(e) {
   try {
     var id = e.parameter.id;
@@ -2737,9 +2738,10 @@ function doPost(e) {
           </textarea
               >
             </div>
+            </div> <!-- CLOSE manual-config-section -->
 
             <div style="display: flex; gap: 10px; flex-wrap: wrap">
-              <button class="btn btn-primary" onclick="saveSettings()">
+              <button class="btn btn-primary" id="btn-save-settings" onclick="saveSettings()">
                 Simpan Pengaturan
               </button>
               <button class="btn btn-outline" onclick="testConnection()">
@@ -6359,6 +6361,8 @@ function doPost(e) {
         const sheetIdInput = document.getElementById("sheet-id");
         const sheetNameInput = document.getElementById("sheet-name");
         const appsScriptUrlInput = document.getElementById("apps-script-url");
+        const manualSection = document.getElementById("manual-config-section");
+        const btnSave = document.getElementById("btn-save-settings");
 
         if (PATENT_SHEET_ID || PATENT_WEB_APP_URL) {
           sheetIdInput.value = PATENT_SHEET_ID || SETTINGS.sheetId;
@@ -6368,10 +6372,16 @@ function doPost(e) {
           sheetIdInput.disabled = !!PATENT_SHEET_ID;
           sheetNameInput.disabled = !!PATENT_SHEET_NAME;
           appsScriptUrlInput.disabled = !!PATENT_WEB_APP_URL;
+
+          if(manualSection) manualSection.style.display = 'none';
+          if(btnSave) btnSave.style.display = 'none';
         } else {
           sheetIdInput.value = SETTINGS.sheetId || "";
           sheetNameInput.value = SETTINGS.sheetName || "BonPinjam";
           appsScriptUrlInput.value = SETTINGS.appsScriptUrl || "";
+          
+          if(manualSection) manualSection.style.display = 'block';
+          if(btnSave) btnSave.style.display = 'inline-block';
         }
         updateSyncStatus();
       }

@@ -18,8 +18,8 @@ async function startServer() {
       }
       if (!fs.existsSync(configPath)) {
         const initialConfig = {
-          spreadsheetId: "1BxiM-placeholder-id-ganti-dengan-spreadsheet-id-anda",
-          appsScriptUrl: "https://script.google.com/macros/s/AKfycb-placeholder-url-ganti-dengan-web-app-url-anda/exec",
+          spreadsheetId: "11rLatTqbJPyX65KQ6br6JulfL3nOoaOn8zPB3dpb88g",
+          appsScriptUrl: "https://script.google.com/macros/s/AKfycbytufiRRixQeetLPNJLwPZAeUFEV_epwtBhCc8ahREsK2u2m_jpLvhC1f-V57q82tMW/exec",
           sheetName: "BonPinjam"
         };
         fs.writeFileSync(configPath, JSON.stringify(initialConfig, null, 2), "utf8");
